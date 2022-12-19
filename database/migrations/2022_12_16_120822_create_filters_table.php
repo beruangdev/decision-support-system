@@ -18,8 +18,6 @@ return new class extends Migration
             $table->string('key');
             $table->string('value');
 
-
-    
             $table->foreignId('calculate_id')->references('id')->on('calculates')->onDelete("cascade");
             $table->timestamps();
         });

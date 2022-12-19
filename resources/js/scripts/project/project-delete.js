@@ -1,4 +1,4 @@
-on(".button-delete-alternative", "click", async (e, _this) => {
+on(".button-delete-project", "click", async (e, _this) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -13,7 +13,7 @@ on(".button-delete-alternative", "click", async (e, _this) => {
         },
     })
 
-    if (window.table_alternative) {
-        window.table_alternative.ajax.reload(null, false)
+    if (window.table_project) {
+        window.table_project.ajax.reload(null, false)
     }
 })

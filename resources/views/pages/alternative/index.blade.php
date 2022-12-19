@@ -3,10 +3,11 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+
                     <table class="setup-datatable stripe hover display" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
                         <thead>
                             <tr>
-                                <th class="opacity-0"></th>
+                                <th></th>
                                 <th class="min-w-[10rem] md:min-w-[15rem]">Name</th>
                                 <th>Description</th>
                                 <th></th>
@@ -24,6 +25,7 @@
                             </tr>
                         </tfoot> --}}
                     </table>
+                    
                 </div>
             </div>
         </div>
@@ -137,8 +139,8 @@
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
+                        // orderable: false,
+                        // searchable: false
                     },
                     {
                         data: 'name',

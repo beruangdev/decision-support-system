@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use Illuminate\Support\Facades\Auth;
+use Yajra\Datatables\Datatables;
 
 class ProjectController extends Controller
 {
@@ -16,6 +18,18 @@ class ProjectController extends Controller
     public function index()
     {
         return view("pages.project.index");
+    }
+
+    public function list()
+    {
+        $data = Project::where("user_id", Auth::id())->get();
+        return Datatables::of($data)
+            ->addIndexColumn()
+            ->addColumn('action', function ($project) {
+                return view("pages.project.components.table-button-action", compact("project"));
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
 
     /**
@@ -36,8 +50,13 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
-        dd($request->all());
-        // dd($errors->any());
+        $project = new Project();
+        $project->name = $request->name;
+        $project->description = $request->description;
+        $project->user_id = Auth::id();
+        $project->save();
+
+        return response()->json(compact("project"));
     }
 
     /**
@@ -71,7 +90,11 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        $project->name = $request->name;
+        $project->description = $request->description;
+        $project->save();
+
+        return response()->json(compact("project"));
     }
 
     /**
@@ -82,6 +105,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        $project->delete();
+        return response()->json(true);
     }
 }

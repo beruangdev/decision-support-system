@@ -9,6 +9,9 @@ import "./scripts/alternative/alternative-create"
 import "./scripts/alternative/alternative-edit"
 import "./scripts/alternative/alternative-delete"
 
+import "./scripts/project/project-create"
+import "./scripts/project/project-edit"
+import "./scripts/project/project-delete"
 
 import "./scripts/flowbite"
 

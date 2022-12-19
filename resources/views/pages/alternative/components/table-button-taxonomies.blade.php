@@ -18,7 +18,7 @@
         <div class="px-3 py-2">
             @forelse ($alternative->alternative_taxonomies as $alternative_taxonomy)
                 <ul>
-                    <li class="grid grid-cols-2 gap-2 border-b py-1">
+                    <li class="grid grid-cols-2 gap-2 py-1 {{ $loop->last ? "" : "border-b"  }}">
                         <div>{{ $alternative_taxonomy->key }}</div>
                         <div>{{ $alternative_taxonomy->value }}</div>
                     </li>

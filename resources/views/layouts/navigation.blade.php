@@ -159,7 +159,7 @@
 
 {{-- Modal ADD Project --}}
 <x-modal name="modal-add-project" focusable>
-    <form method="post" action="{{ route('project.store') }}" class="p-6">
+    <form method="post" action="{{ route('project.store') }}" class="p-6" x-data="createProject($el)" x-init="init" @submit.prevent="submit">
         @csrf
 
         <h2 class="text-lg font-medium text-gray-900 flex">
@@ -172,16 +172,40 @@
             {{ __('Add New Project') }}
         </h2>
 
-        <div class="mt-6">
-            <x-input-label for="project-name" value="Name" class="sr-only" />
-            <x-text-input id="project-name" name="name" type="text" class="mt-1 block w-full" placeholder="Name" />
+        <div class="mb-3 mt-6">
+            <div class="wrapper-input-floating-label">
+                <div class="relative">
+                    <input type="text" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer" name="name"
+                        placeholder=" " :value="body.name.value" x-model="body.name.value" data-required />
+                    <label
+                        class="absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">
+                        Name
+                    </label>
+                </div>
+                <p class="mt-1 text-xs text-red-600 dark:text-red-400 input-floating-label-error-message" x-text="body.name.message">
+                    <span class="font-medium">Oh, snapp!</span> Some error message.
+                </p>
+            </div>
         </div>
-        <div class="mt-2">
-            <x-textarea name="description" id="project-description" class="w-full" placeholder="Project description..."></x-textarea>
+
+        <div class="mb-3">
+            <div class="wrapper-input-floating-label">
+                <div class="relative">
+                    <textarea name="description" cols="30" rows="4" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer"
+                        placeholder=" " :value="body.description.value" x-model="body.description.value"></textarea>
+                    <label for="outlined_error"
+                        class="absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-5 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">
+                        Description
+                    </label>
+                </div>
+                <p class="mt-1 text-xs text-red-600 dark:text-red-400 input-floating-label-error-message" x-text="body.description.message">
+                    <span class="font-medium">Oh, snapp!</span> Some error message.
+                </p>
+            </div>
         </div>
 
         <div class="mt-6 flex justify-end">
-            <x-secondary-button x-on:click="$dispatch('close')">
+            <x-secondary-button x-on:click="$dispatch('close')" class="modal-close">
                 {{ __('Cancel') }}
             </x-secondary-button>
 

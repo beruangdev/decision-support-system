@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
+    Route::get("project/list", [ProjectController::class, "list"])->name("project.list");
     Route::resource("project", ProjectController::class);
     Route::get("alternative/list", [AlternativeController::class, "list"])->name("alternative.list");
     Route::resource("alternative", AlternativeController::class);

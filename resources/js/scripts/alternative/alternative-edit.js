@@ -89,8 +89,8 @@ function editAltenative(element) {
             })
         },
         addTaxonomy() {
-            const key = element.querySelector("#alternative-key").value
-            const value = element.querySelector("#alternative-value").value
+            const key = element.querySelector("#alternative-edit-key").value
+            const value = element.querySelector("#alternative-edit-value").value
             if (key && value) {
                 this.taxonomies.push({ key, value })
             }
