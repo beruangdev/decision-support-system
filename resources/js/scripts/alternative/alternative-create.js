@@ -4,9 +4,9 @@ function storeAltenative(element) {
         body: {},
         element,
         taxonomies: [
-            { key: "Provinsi", value: "Aceh" },
-            { key: "Kabupaten", value: "Aceh Barat" },
-            { key: "Salary", value: "1000000" },
+            // { key: "Provinsi", value: "Aceh" },
+            // { key: "Kabupaten", value: "Aceh Barat" },
+            // { key: "Salary", value: "1000000" },
         ],
         target_dom: "input#alternative-name, textarea#alternative-description",
         async submitStoreAltenative(e) {
