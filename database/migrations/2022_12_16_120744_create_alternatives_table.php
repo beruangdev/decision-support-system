@@ -18,8 +18,8 @@ return new class extends Migration
 
             $table->foreignId('user_id')->references('id')->on('users');
             $table->string('name');
-            $table->text('description');
-            $table->text('taxonomie_strings');
+            $table->text('description')->nullable();
+            $table->text('taxonomie_strings')->nullable();
 
             $table->timestamps();
         });

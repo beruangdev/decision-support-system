@@ -11,6 +11,7 @@
                                 <th>Description</th>
                                 <th></th>
                                 <th></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -116,8 +117,8 @@
                 {{ __('Cancel') }}
             </x-secondary-button>
 
-            <x-secondary-button class="ml-3 bg-gray-700 text-white hover:bg-gray-900" type="submit">
-                {{ __('Submit') }}
+            <x-secondary-button class="ml-3 bg-gray-700 text-white hover:!bg-gray-900" type="submit">
+                {{ __('Update') }}
             </x-secondary-button>
         </div>
     </form>
@@ -146,6 +147,11 @@
                     {
                         data: 'description',
                         name: 'description',
+                    },
+                    {
+                        data: 'taxonomie_strings',
+                        name: 'taxonomie_strings',
+                        visible: false,
                     },
                     {
                         data: 'taxonomies',

@@ -20,8 +20,7 @@ class AlternativeController extends Controller
      */
     public function index(Request $request)
     {
-        $alternatives = Alternative::where("user_id", Auth::id())->paginate(10);
-        return view("pages.alternative.index", compact("alternatives"));
+        return view("pages.alternative.index");
     }
 
     public function list()
@@ -59,6 +58,7 @@ class AlternativeController extends Controller
     {
         $requests = $requests->all();
 
+        $alternatives = [];
         foreach ($requests as $request) {
             $taxonomie_strings = [];
             foreach ($request["taxonomies"] as $req_taxonomy) {
@@ -74,7 +74,6 @@ class AlternativeController extends Controller
             $alternative->taxonomie_strings = $taxonomie_strings;
             $alternative->user_id = Auth::id();
             $alternative->save();
-
             $taxonomies = [];
             foreach ($request["taxonomies"] as $req_taxonomy) {
                 $taxonomy = new AlternativeTaxonomie();
@@ -87,6 +86,9 @@ class AlternativeController extends Controller
                 $taxonomy->save();
                 array_push($taxonomies, $taxonomy);
             }
+
+            $alternative["taxonomies"] = $taxonomies;
+            array_push($alternatives, $alternative);
         }
         return response()->json(compact("alternative", "taxonomies"));
     }
@@ -122,8 +124,17 @@ class AlternativeController extends Controller
      */
     public function update(UpdateAlternativeRequest $request, Alternative $alternative)
     {
+        $taxonomie_strings = [];
+        foreach ($request->taxonomies as $req_taxonomy) {
+            $key = Str::slug($req_taxonomy['key']);
+            $value = Str::slug($req_taxonomy['value']);
+            array_push($taxonomie_strings, "{$key}={$value}");
+        }
+        $taxonomie_strings = join(",", $taxonomie_strings);
+        
         $alternative->name = $request->name;
         $alternative->description = $request->description;
+        $alternative->taxonomie_strings = $taxonomie_strings;
         $alternative->save();
 
         $taxonomies = [];
