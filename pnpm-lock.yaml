@@ -5,9 +5,11 @@ specifiers:
   alpinejs: ^3.4.2
   autoprefixer: ^10.4.2
   axios: ^1.1.2
+  flowbite: ^1.5.5
   laravel-vite-plugin: ^0.7.2
   lodash: ^4.17.19
   postcss: ^8.4.6
+  sass: ^1.57.0
   tailwindcss: ^3.1.0
   vite: ^4.0.0
 
@@ -16,11 +18,13 @@ devDependencies:
   alpinejs: 3.10.5
   autoprefixer: 10.4.13_postcss@8.4.20
   axios: 1.2.1
+  flowbite: 1.5.5
   laravel-vite-plugin: 0.7.2_vite@4.0.1
   lodash: 4.17.21
   postcss: 8.4.20
+  sass: 1.57.0
   tailwindcss: 3.2.4_postcss@8.4.20
-  vite: 4.0.1
+  vite: 4.0.1_sass@1.57.0
 
 packages:
 
@@ -241,6 +245,10 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.14.0
+    dev: true
+
+  /@popperjs/core/2.11.6:
+    resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
     dev: true
 
   /@tailwindcss/forms/0.5.3_tailwindcss@3.2.4:
@@ -483,6 +491,13 @@ packages:
       to-regex-range: 5.0.1
     dev: true
 
+  /flowbite/1.5.5:
+    resolution: {integrity: sha512-LWJteH6zO+6BrnerH6GEU9OFpjWmkCWi9BD3XnJdBOVevNnt7u8gW+S+4keqD5OGpHu+QU860pLzNKeNlhlf6g==}
+    dependencies:
+      '@popperjs/core': 2.11.6
+      mini-svg-data-uri: 1.4.4
+    dev: true
+
   /follow-redirects/1.15.2:
     resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
     engines: {node: '>=4.0'}
@@ -539,6 +554,10 @@ packages:
       function-bind: 1.1.1
     dev: true
 
+  /immutable/4.1.0:
+    resolution: {integrity: sha512-oNkuqVTA8jqG1Q6c+UglTOD1xhC1BtjKI7XkCXRkZHrN5m18/XsnUp8Q89GkQO/z+0WjonSvl0FLhDYftp46nQ==}
+    dev: true
+
   /is-binary-path/2.1.0:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
     engines: {node: '>=8'}
@@ -576,7 +595,7 @@ packages:
       vite: ^3.0.0 || ^4.0.0
     dependencies:
       picocolors: 1.0.0
-      vite: 4.0.1
+      vite: 4.0.1_sass@1.57.0
       vite-plugin-full-reload: 1.0.5_vite@4.0.1
     dev: true
 
@@ -790,6 +809,16 @@ packages:
       queue-microtask: 1.2.3
     dev: true
 
+  /sass/1.57.0:
+    resolution: {integrity: sha512-IZNEJDTK1cF5B1cGA593TPAV/1S0ysUDxq9XHjX/+SMy0QfUny+nfUsq5ZP7wWSl4eEf7wDJcEZ8ABYFmh3m/w==}
+    engines: {node: '>=12.0.0'}
+    hasBin: true
+    dependencies:
+      chokidar: 3.5.3
+      immutable: 4.1.0
+      source-map-js: 1.0.2
+    dev: true
+
   /source-map-js/1.0.2:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
     engines: {node: '>=0.10.0'}
@@ -863,10 +892,10 @@ packages:
     dependencies:
       picocolors: 1.0.0
       picomatch: 2.3.1
-      vite: 4.0.1
+      vite: 4.0.1_sass@1.57.0
     dev: true
 
-  /vite/4.0.1:
+  /vite/4.0.1_sass@1.57.0:
     resolution: {integrity: sha512-kZQPzbDau35iWOhy3CpkrRC7It+HIHtulAzBhMqzGHKRf/4+vmh8rPDDdv98SWQrFWo6//3ozwsRmwQIPZsK9g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -895,6 +924,7 @@ packages:
       postcss: 8.4.20
       resolve: 1.22.1
       rollup: 3.7.4
+      sass: 1.57.0
     optionalDependencies:
       fsevents: 2.3.2
     dev: true

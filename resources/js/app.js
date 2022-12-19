@@ -1,7 +1,16 @@
 import './bootstrap';
 
 // import "./scripts/get-daerah"
-import "./scripts/modal-add-alternative"
+import "./scripts/helper"
+import "./scripts/dropdown"
+
+
+import "./scripts/alternative/alternative-create"
+import "./scripts/alternative/alternative-edit"
+import "./scripts/alternative/alternative-delete"
+
+
+import "./scripts/flowbite"
 
 import Alpine from 'alpinejs';
 

@@ -13,14 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('alternatives', function (Blueprint $table) {
+        Schema::create('filter_taxonomies', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('user_id')->references('id')->on('users');
-            $table->string('name');
-            $table->text('description');
-            $table->text('taxonomie_strings');
-
+            $table->string("key");
+            $table->string("key_slug");
+            $table->text("value");
+            $table->text("value_slug");
+            $table->foreignId('filter_id')->references('id')->on('filters')->onDelete("cascade");
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete("cascade");
             $table->timestamps();
         });
     }
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('alternatives');
+        Schema::dropIfExists('filter_taxonomies');
     }
 };

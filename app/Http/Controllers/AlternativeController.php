@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Alternative;
 use App\Http\Requests\StoreAlternativeRequest;
 use App\Http\Requests\UpdateAlternativeRequest;
+use App\Models\AlternativeTaxonomie;
+use Illuminate\Http\Request;
+use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class AlternativeController extends Controller
 {
@@ -13,9 +18,25 @@ class AlternativeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $alternatives = Alternative::where("user_id", Auth::id())->paginate(10);
+        return view("pages.alternative.index", compact("alternatives"));
+    }
+
+    public function list()
+    {
+        $data = Alternative::where("user_id", Auth::id())->with(["alternative_taxonomies"])->get();
+        return Datatables::of($data)
+            ->addIndexColumn()
+            ->addColumn('taxonomies', function ($alternative) {
+                return view("pages.alternative.components.table-button-taxonomies", compact("alternative"));
+            })
+            ->addColumn('action', function ($alternative) {
+                return view("pages.alternative.components.table-button-action", compact("alternative"));
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
 
     /**
@@ -34,9 +55,40 @@ class AlternativeController extends Controller
      * @param  \App\Http\Requests\StoreAlternativeRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreAlternativeRequest $request)
+    public function store(StoreAlternativeRequest $requests)
     {
-        dd($request->all());
+        $requests = $requests->all();
+
+        foreach ($requests as $request) {
+            $taxonomie_strings = [];
+            foreach ($request["taxonomies"] as $req_taxonomy) {
+                $key = Str::slug($req_taxonomy['key']);
+                $value = Str::slug($req_taxonomy['value']);
+                array_push($taxonomie_strings, "{$key}={$value}");
+            }
+            $taxonomie_strings = join(",", $taxonomie_strings);
+
+            $alternative = new Alternative();
+            $alternative->name = $request["name"];
+            $alternative->description = $request["description"];
+            $alternative->taxonomie_strings = $taxonomie_strings;
+            $alternative->user_id = Auth::id();
+            $alternative->save();
+
+            $taxonomies = [];
+            foreach ($request["taxonomies"] as $req_taxonomy) {
+                $taxonomy = new AlternativeTaxonomie();
+                $taxonomy->key = $req_taxonomy["key"];
+                $taxonomy->key_slug = Str::slug($req_taxonomy["key"]);
+                $taxonomy->value = $req_taxonomy["value"];
+                $taxonomy->value_slug = Str::slug($req_taxonomy["value"]);
+                $taxonomy->alternative_id = $alternative->id;
+                $taxonomy->user_id = Auth::id();
+                $taxonomy->save();
+                array_push($taxonomies, $taxonomy);
+            }
+        }
+        return response()->json(compact("alternative", "taxonomies"));
     }
 
     /**
@@ -70,7 +122,25 @@ class AlternativeController extends Controller
      */
     public function update(UpdateAlternativeRequest $request, Alternative $alternative)
     {
-        //
+        $alternative->name = $request->name;
+        $alternative->description = $request->description;
+        $alternative->save();
+
+        $taxonomies = [];
+        AlternativeTaxonomie::where("alternative_id", $alternative->id)->delete();
+        foreach ($request->taxonomies as $req_taxonomy) {
+            $taxonomy = new AlternativeTaxonomie();
+            $taxonomy->key = $req_taxonomy["key"];
+            $taxonomy->key_slug = Str::slug($req_taxonomy["key"]);
+            $taxonomy->value = $req_taxonomy["value"];
+            $taxonomy->value_slug = Str::slug($req_taxonomy["value"]);
+            $taxonomy->alternative_id = $alternative->id;
+            $taxonomy->user_id = Auth::id();
+            $taxonomy->save();
+            array_push($taxonomies, $taxonomy);
+        }
+
+        return response()->json(compact("alternative", "taxonomies"));
     }
 
     /**
@@ -81,6 +151,7 @@ class AlternativeController extends Controller
      */
     public function destroy(Alternative $alternative)
     {
-        //
+        $alternative->delete();
+        return response()->json(true);
     }
 }

@@ -59,7 +59,7 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <x-dropdown-link :href="route('profile.edit')">
+                            <x-dropdown-link :href="route('alternative.index')">
                                 {{ __('All Alternative') }}
                             </x-dropdown-link>
                             <x-dropdown-link x-on:click.prevent="$dispatch('open-modal', 'modal-add-alternative')">
@@ -212,109 +212,72 @@
                     <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit text-sm text-red-500 leading-3" x-text="body.name.message"></p>
                 </label>
             </template>
-            <x-text-input id="alternative-name" name="name" type="text" placeholder="Name" class="mt-1 block w-full" />
+            <input type="text" id="alternative-name" name="name" placeholder="Name" :value="body.name.value" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm mt-1 block w-full">
         </div>
         <div class="mt-2">
-            <template x-if="body.nik.error">
-                <label for="alternative-nik">
-                    <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit  text-sm text-red-500 leading-3" x-text="body.nik.message"></p>
+            <template x-if="body.description.error">
+                <label for="alternative-description">
+                    <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit  text-sm text-red-500 leading-3" x-text="body.description.message"></p>
                 </label>
             </template>
-            <x-text-input id="alternative-nik" name="nik" type="text" placeholder="Nomor Induk Kependudukan (NIK)" class="mt-1 block w-full" />
-        </div>
-        <div class="mt-2">
-            <template x-if="body.nkk.error">
-                <label for="alternative-nkk">
-                    <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit  text-sm text-red-500 leading-3" x-text="body.nkk.message"></p>
-                </label>
-            </template>
-            <x-text-input id="alternative-nkk" name="nkk" type="text" class="mt-1 block w-full" placeholder="Nomor Kartu Keluarga" />
-        </div>
-        <div class="mt-2">
-            <template x-if="body.address.error">
-                <label for="alternative-address">
-                    <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit  text-sm text-red-500 leading-3" x-text="body.address.message"></p>
-                </label>
-            </template>
-            <x-text-input id="alternative-address" name="address" type="text" class="mt-1 block w-full" placeholder="Address" />
-        </div>
-        <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div>
-                <template x-if="body.phone.error">
-                    <label for="alternative-phone">
-                        <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit  text-sm text-red-500 leading-3" x-text="body.phone.message"></p>
-                    </label>
-                </template>
-                <x-text-input id="alternative-phone" name="phone" type="text" class="mt-1 block w-full" placeholder="Phone" />
-            </div>
-
-            <div>
-                <template x-if="body.salary.error">
-                    <label for="alternative-salary">
-                        <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit  text-sm text-red-500 leading-3" x-text="body.salary.message"></p>
-                    </label>
-                </template>
-                <x-text-input id="alternative-salary" name="salary" type="text" class="mt-1 block w-full" placeholder="Salary" />
-            </div>
+            <textarea id="alternative-description" name="description" placeholder="Description" class="mt-1 block w-full" x-text="body.description.value":value="body.description.value" id="" cols="30" rows="4"></textarea>
         </div>
 
 
+        <div class="mt-4">
+            <p class="mb-1">Add Alternative Taxonomy (if number just fill numerik value)</p>
+            <div class="grid grid-cols-12 gap-2">
+                <x-text-input id="alternative-key" name="key" type="text" placeholder="Key" class="col-span-5" />
+                <x-text-input id="alternative-value" name="value" type="text" placeholder="Value" class="col-span-5 md:col-span-6" />
+                <x-secondary-button class="px-3 py-1 col-span-2 md:col-span-1 flex flex-wrap justify-center items-center bg-gray-600 hover:!bg-gray-700" type="button" @click.prevent="addTaxonomy">
+                    <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                    </svg>
+                </x-secondary-button>
+            </div>
+        </div>
 
-        <div class="mt-3 flex flex-wrap items-center">
-            <label for="project-province" class="basis-full md:basis-3/12">Province</label>
-            <div class="basis-full md:basis-9/12">
-                <template x-if="body.province.error">
-                    <label for="alternative-province" class="relative z-10 -mb-[0.8rem] px-2 py-1 bg-white ml-2 w-fit">
-                        <p class="text-sm text-red-500 leading-3" x-text="body.province.message"></p>
-                    </label>
-                </template>
-                <select name="province" id="project-province" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full" disabled>
-                    <option value="">-</option>
-                </select>
-            </div>
+        <div class="mt-4 overflow-auto">
+            <p class="mb-1">Alternative Taxonomy</p>
+            <table class="table-fixed w-full border-separate">
+                <thead>
+                    <tr>
+                        <th class="text-sm text-slate-700 text-left pl-3 py-2 border-2 border-slate-400 w-5/12">KEY</th>
+                        <th class="text-sm text-slate-700 text-left pl-3 py-2 border-2 border-slate-400 w-5/12 md:w-6/12">VALUE</th>
+                        <th class="text-sm text-slate-700 text-left pl-3 py-2 w-2/12 md:w-1/12"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template x-for="(taxonomy, index) in taxonomies" :key="index">
+                        <tr>
+                            <td class="p-0">
+                                <input type="text" :value="taxonomy.key" @keydown="updateTaxonomy(index, 'key', $el.value)" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm w-[-webkit-fill-available]">
+                            </td>
+                            <td class="p-0">
+                                <input type="text" :value="taxonomy.value" @keydown="updateTaxonomy(index, 'value', $el.value)"
+                                    class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm w-[-webkit-fill-available]">
+                            </td>
+                            {{-- <td x-text="taxonomy.key"></td> --}}
+                            {{-- <td x-text="taxonomy.value"></td> --}}
+                            <td class="p-0">
+                                <div class="flex flex-wrap justify-end items-center">
+                                    <x-danger-button @click.prevent="deleteTaxonomy(index)" class="px-2 py-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
+                                        </svg>
+                                    </x-danger-button>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
         </div>
-        <div class="mt-3 flex flex-wrap items-center">
-            <label for="project-kabupaten" class="basis-full md:basis-3/12">Kabupaten</label>
-            <div class="basis-full md:basis-9/12">
-                <template x-if="body.kabupaten.error">
-                    <div class="relative z-10 -mb-[0.8rem] px-2 py-1 bg-white ml-2 w-fit">
-                        <p class="text-sm text-red-500 leading-3" x-text="body.kabupaten.message"></p>
-                    </div>
-                </template>
-                <select name="kabupaten" id="project-kabupaten" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full" disabled>
-                    <option value="">-</option>
-                </select>
-            </div>
-        </div>
-        <div class="mt-3 flex flex-wrap items-center">
-            <label for="project-kecamatan" class="basis-full md:basis-3/12">Kecamatan</label>
-            <div class="basis-full md:basis-9/12">
-                <template x-if="body.kecamatan.error">
-                    <div class="relative z-10 -mb-[0.8rem] px-2 py-1 bg-white ml-2 w-fit">
-                        <p class="text-sm text-red-500 leading-3" x-text="body.kecamatan.message"></p>
-                    </div>
-                </template>
-                <select name="kecamatan" id="project-kecamatan" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full" disabled>
-                    <option value="">-</option>
-                </select>
-            </div>
-        </div>
-        <div class="mt-3 flex flex-wrap items-center">
-            <label for="project-village" class="basis-full md:basis-3/12">Desa</label>
-            <div class="basis-full md:basis-9/12">
-                <template x-if="body.village.error">
-                    <div class="relative z-10 -mb-[0.8rem] px-2 py-1 bg-white ml-2 w-fit">
-                        <p class="text-sm text-red-500 leading-3" x-text="body.village.message"></p>
-                    </div>
-                </template>
-                <select name="village" id="project-village" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full" disabled>
-                    <option value="">-</option>
-                </select>
-            </div>
-        </div>
+
 
         <div class="mt-6 flex justify-end">
-            <x-secondary-button x-on:click="$dispatch('close')">
+            <x-secondary-button class="close-alternative-modal" x-on:click="$dispatch('close')">
                 {{ __('Cancel') }}
             </x-secondary-button>
 

@@ -5,6 +5,7 @@ module.exports = {
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
+        // './app/Http/Controllers/*.blade.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.js',
     ],
@@ -17,5 +18,8 @@ module.exports = {
         },
     },
 
-    plugins: [require('@tailwindcss/forms')],
+    plugins: [
+        require('@tailwindcss/forms'),
+        require('flowbite/plugin'),
+    ],
 };

@@ -24,6 +24,8 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    $taxonomies = [];
+
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -34,6 +36,7 @@ Route::middleware('auth')->group(function () {
 
 
     Route::resource("project", ProjectController::class);
+    Route::get("alternative/list", [AlternativeController::class, "list"])->name("alternative.list");
     Route::resource("alternative", AlternativeController::class);
 });
 
