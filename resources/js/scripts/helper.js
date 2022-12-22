@@ -15,3 +15,4 @@ window.on = function (selector, event, handler) {
         true
     );
 }
+

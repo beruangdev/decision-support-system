@@ -1,75 +1,15 @@
-window.storeAltenative = storeAltenative
-function storeAltenative(element) {
+window.createAltenative = function (element) {
     return {
         body: {},
+        input_selector: ".alternative-input input, .alternative-input textarea",
         element,
         taxonomies: [
             // { key: "Provinsi", value: "Aceh" },
             // { key: "Kabupaten", value: "Aceh Barat" },
             // { key: "Salary", value: "1000000" },
         ],
-        target_dom: "input#alternative-name, textarea#alternative-description",
-        async submitStoreAltenative(e) {
-            e.preventDefault()
-            e.stopPropagation()
-            let inputs = element.querySelectorAll(this.target_dom)
-            let values = []
-            inputs.forEach(input => {
-                values.push(input.value)
-                this.body[input.name].value = input.value
-                let str_class = "border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"
-                if (input.value.length > 0) {
-                    this.body[input.name].error = false
-                } else {
-                    str_class = "border-red-500 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm w-full"
-                    this.body[input.name].error = true
-                }
-                input.setAttribute("class", str_class)
-            });
-
-            let request = {}
-            Object.keys(this.body).forEach(key => {
-                request[key] = this.body[key].value
-            })
-            request["taxonomies"] = this.taxonomies.map(tax => {
-                return {
-                    key: tax.key,
-                    value: tax.value,
-                }
-            })
-            request = [request]
-            if (values.every(value => value != "")) {
-                // element.submit()
-                let res = await fetch(routes["alternative.store"].uri, {
-                    method: 'POST',
-                    body: JSON.stringify(request),
-                    headers: {
-                        "Accept": "application/json, text-plain, */*",
-                        "X-Requested-With": "XMLHttpRequest",
-                        'Content-Type': 'application/json',
-                        'url': routes["alternative.store"].uri,
-                        "X-CSRF-Token": csrf
-                    },
-                })
-
-                res = await res.json()
-                Object.keys(this.body).forEach(key => {
-                    this.body[key] = {...this.body[key], value: "" }
-                })
-
-                this.taxonomies = []
-                element.querySelector(".close-alternative-modal").click()
-                element.querySelector("#alternative-description").innerHtml = ""
-
-                if(window.table_alternative){
-                    window.table_alternative.ajax.reload(null, false)
-                }
-            }
-        },
-        initStoreAltenative() {
-            let str_class = "border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-            element.querySelectorAll(this.target_dom).forEach(input => {
-                input.setAttribute("class", str_class)
+        init() {
+            element.querySelectorAll(this.input_selector).forEach(input => {
                 this.body[input.name] = {
                     value: "",
                     error: false,
@@ -78,6 +18,69 @@ function storeAltenative(element) {
                 }
             });
         },
+        async submit() {
+            if (!this.validate()) return false
+            const request = this.make_request_data()
+            this.ajax(request)
+        },
+        make_request_data() {
+            let request = {
+                alternatives: [],
+                taxonomies: [],
+            }
+            let alternative = {}
+            Object.keys(this.body).forEach(key => {
+                alternative[key] = this.body[key].value
+                this.body[key].value = ""
+            })
+            request.alternatives.push(alternative)
+
+            let taxonomy = this.taxonomies.map(tax => {
+                return {
+                    key: tax.key,
+                    value: tax.value,
+                }
+            })
+            request.taxonomies.push(taxonomy)
+            this.taxonomies = []
+            return request
+        },
+        async ajax(request) {
+            element.querySelector(".modal-close").click()
+            let response = await fetch(this.url(), {
+                method: 'POST',
+                body: JSON.stringify(request),
+                headers: {
+                    "Accept": "application/json, text-plain, */*",
+                    "X-Requested-With": "XMLHttpRequest",
+                    'Content-Type': 'application/json',
+                    'url': this.url(),
+                    "X-CSRF-Token": csrf
+                },
+            })
+            if (window.table_alternative) {
+                window.table_alternative.ajax.reload(null, false)
+            }
+        },
+        url() {
+            return routes["alternative.store"].uri
+        },
+        validate() {
+            let result = true
+            element.querySelectorAll(this.input_selector).forEach(el => {
+                let classList = el.closest(".wrapper-input-floating-label")?.classList
+                if (classList) {
+                    if (el.getAttribute("data-required") != undefined && el.value == "") {
+                        if (!classList.contains("error")) classList.add("error")
+                        result = false
+                    } else {
+                        if (classList.contains("error")) classList.remove("error")
+                    }
+                }
+            })
+            return result
+        },
+
         addTaxonomy() {
             const key = element.querySelector("#alternative-key").value
             const value = element.querySelector("#alternative-value").value

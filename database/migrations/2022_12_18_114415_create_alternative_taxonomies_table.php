@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string("key_slug");
             $table->text("value");
             $table->text("value_slug");
+            $table->integer("order")->default(1);
             $table->foreignId('alternative_id')->references('id')->on('alternatives')->onDelete("cascade");
             $table->foreignId('user_id')->references('id')->on('users')->onDelete("cascade");
             $table->timestamps();

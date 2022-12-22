@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Algorithm;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class AlgorithmSeeder extends Seeder
 {
@@ -15,8 +16,12 @@ class AlgorithmSeeder extends Seeder
      */
     public function run()
     {
-        $user = new Algorithm();
-        $user->name = "Evaluation based on Distance from Average Solution (EDAS)";
-        $user->save();
+        $algorithms = ["Evaluation based on Distance from Average Solution (EDAS)"];
+        foreach ($algorithms as $key => $value) {
+            $algorithm = new Algorithm();
+            $algorithm->name = $value;
+            $algorithm->slug = Str::slug($value);
+            $algorithm->save();
+        }
     }
 }

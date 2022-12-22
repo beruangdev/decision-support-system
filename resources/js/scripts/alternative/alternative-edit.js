@@ -6,10 +6,11 @@ function editAltenative(element) {
         taxonomy: null,
         taxonomies: [],
         target_dom: "input#alternative-edit-name, textarea#alternative-edit-description",
+        target_dom_validate: "input#alternative-edit-name",
         async submitEditAltenative(e) {
             e.preventDefault()
             e.stopPropagation()
-            let inputs = element.querySelectorAll(this.target_dom)
+            let inputs = element.querySelectorAll(this.target_dom_validate)
             let values = []
             inputs.forEach(input => {
                 values.push(input.value)
@@ -34,9 +35,8 @@ function editAltenative(element) {
                     value: tax.value,
                 }
             })
-            // request = [request]
             if (values.every(value => value != "")) {
-                // element.submit()
+                element.querySelector(".close-alternative-edit-modal").click()
                 let res = await fetch(`${routes["alternative.index"].uri}/${this.taxonomy.id}`, {
                     method: 'PUT',
                     body: JSON.stringify(request),
@@ -49,14 +49,12 @@ function editAltenative(element) {
                     },
                 })
 
-                res = await res.json()
-                console.log({ res });
+                // res = await res.json()
                 
                 Object.keys(this.body).forEach(key => {
                     this.body[key] = { ...this.body[key], value: "" }
                 })
                 this.taxonomies = []
-                element.querySelector(".close-alternative-edit-modal").click()
                 // element.querySelector("#alternative-description").innerHtml = ""
 
                 if (window.table_alternative) {

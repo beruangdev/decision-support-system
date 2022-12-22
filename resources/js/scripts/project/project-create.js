@@ -1,49 +1,53 @@
 window.createProject = function (element) {
 
     return {
+        body: {},
         element,
         input_selector: "input, textarea",
-        body: {},
         init() {
             element.querySelectorAll("input, textarea").forEach(el_input => {
                 this.body[el_input.name] = {
                     name: el_input.name,
                     value: el_input.value,
                     error: false,
-                    message: `Input ${el_input.name} is required`
+                    message: `The ${el_input.name} is required`
                 }
             });
-            console.log(this.body);
         },
         async submit() {
-            console.log("SUBMIT");
             if (!this.validate()) return false
-            var request = {}
+            const request = this.make_request_data()
+            this.ajax(request)
+        },
+        make_request_data(){
+            let request = {}
             Object.keys(this.body).forEach(key => {
                 request[key] = this.body[key].value
                 this.body[key].value = ""
             })
-
+            return request
+        },
+        async ajax(request) {
             element.querySelector(".modal-close").click()
-            console.log({ request });
-            let response = await fetch(routes["project.store"].uri, {
+            let response = await fetch(this.url(), {
                 method: 'POST',
                 body: JSON.stringify(request),
                 headers: {
                     "Accept": "application/json, text-plain, */*",
                     "X-Requested-With": "XMLHttpRequest",
                     'Content-Type': 'application/json',
-                    'url': routes["project.store"].uri,
+                    'url': this.url(),
                     "X-CSRF-Token": csrf
                 },
             })
             response = await response.json()
-            console.log("response", response);
-            console.log(this.body);
-
+            console.log(response);
             if (window.table_project) {
                 window.table_project.ajax.reload(null, false)
             }
+        },
+        url() {
+            return routes["project.store"].uri
         },
         validate() {
             let result = true

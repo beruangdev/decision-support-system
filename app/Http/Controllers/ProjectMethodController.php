@@ -36,7 +36,8 @@ class ProjectMethodController extends Controller
      */
     public function store(StoreProjectMethodRequest $request)
     {
-        //
+
+        return response()->json($request->all());
     }
 
     /**

@@ -4,3 +4,21 @@
 
 @import "components/datatable";
 @import "components/flowbite";
+// @import "components/select2";
+
+// Dark Mode
+// .bg-white{
+//     @apply dark:bg-gray-900/40;
+// }
+
+.text-gray-500, h1, h2, h3, h4, h5, h6, p, a, span {
+    @apply dark:text-gray-300;
+}
+
+input, textarea{
+    @apply dark:border-gray-700;
+}
+
+// main .bg-white {
+//     @apply dark:bg-gray-800;
+// }

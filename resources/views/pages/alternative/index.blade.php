@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
                     <table class="setup-datatable stripe hover display" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
@@ -10,7 +10,7 @@
                                 <th></th>
                                 <th class="min-w-[10rem] md:min-w-[15rem]">Name</th>
                                 <th>Description</th>
-                                <th></th>
+                                <th class="min-w-[15rem]">Details</th>
                                 <th></th>
                                 <th></th>
                             </tr>
@@ -25,7 +25,7 @@
                             </tr>
                         </tfoot> --}}
                     </table>
-                    
+
                 </div>
             </div>
         </div>
@@ -51,7 +51,8 @@
                     <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit text-sm text-red-500 leading-3" x-text="body.name.message"></p>
                 </label>
             </template>
-            <input type="text" id="alternative-edit-name" name="name" placeholder="Name" :value="body.name.value" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm rounded-md mt-1 block w-full">
+            <input type="text" id="alternative-edit-name" name="name" placeholder="Name" :value="body.name.value" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm rounded-md mt-1 block w-full"
+                data-required>
         </div>
         <div class="mt-2">
             <template x-if="body.description.error">
@@ -64,7 +65,7 @@
 
 
         <div class="mt-4">
-            <p class="mb-1">Add Alternative Taxonomy (if number just fill numerik value)</p>
+            <p class="mb-1">Add Alternative Details (if number just fill numerik value)</p>
             <div class="grid grid-cols-12 gap-2">
                 <x-text-input id="alternative-edit-key" name="key" type="text" placeholder="Key" class="col-span-5" />
                 <x-text-input id="alternative-edit-value" name="value" type="text" placeholder="Value" class="col-span-5 md:col-span-6" />
@@ -77,7 +78,7 @@
         </div>
 
         <div class="mt-4 overflow-auto">
-            <p class="mb-1">Alternative Taxonomy</p>
+            <p class="mb-1">Alternative Details</p>
             <table class="table-fixed w-full border-separate">
                 <thead>
                     <tr>
@@ -133,7 +134,7 @@
             var table_alternative = $('.setup-datatable').DataTable({
                 responsive: true,
                 processing: true,
-                // serverSide: true,
+                serverSide: true,
                 deferRender: true,
                 ajax: "{{ route('alternative.list') }}",
                 columns: [{
@@ -150,11 +151,7 @@
                         data: 'description',
                         name: 'description',
                     },
-                    {
-                        data: 'taxonomie_strings',
-                        name: 'taxonomie_strings',
-                        visible: false,
-                    },
+
                     {
                         data: 'taxonomies',
                         name: 'taxonomies',
@@ -166,6 +163,11 @@
                         name: 'action',
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        data: 'taxonomie_strings',
+                        name: 'taxonomie_strings',
+                        visible: false,
                     },
                 ],
             });

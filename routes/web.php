@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AlternativeController;
+use App\Http\Controllers\ProjectMethodController;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -24,8 +25,6 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    $taxonomies = [];
-
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -39,6 +38,9 @@ Route::middleware('auth')->group(function () {
     Route::resource("project", ProjectController::class);
     Route::get("alternative/list", [AlternativeController::class, "list"])->name("alternative.list");
     Route::resource("alternative", AlternativeController::class);
+
+
+    Route::get("project_method/create/{project_id}", [ProjectMethodController::class, "create"])->name("project_method.create");
 });
 
 require __DIR__ . '/auth.php';
