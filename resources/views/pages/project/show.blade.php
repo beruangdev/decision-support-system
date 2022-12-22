@@ -77,27 +77,6 @@
                                     </x-textarea-float>
                                 </div>
 
-                                {{-- Count Criterias --}}
-                                <template x-if="Object.keys(criterias).length > 0">
-                                    <div class="container-weight">
-                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Specify criteria <span class="text-xs">*select at least 3 criteria</span></label>
-                                        <template x-for="(criteria, index) in criterias.filter(c => c.status)">
-                                            <div class="flex flex-col mb-4 px-4 pt-2 pb-4 rounded-md border border-gray-700">
-                                                <div class="mb-3 grid grid-cols-11 gap-2">
-                                                    <p x-text="criteria.label1" class="col-span-5 flex items-center text-[0.9rem]"></p>
-                                                    <p x-text="weights[criteria.value]" class="col-span-1 aspect-square flex items-center border justify-center  border-gray-700 rounded-md"></p>
-                                                    <p x-text="criteria.label2" class="col-span-5 flex items-center text-[0.9rem]"></p>
-                                                </div>
-                                                <input :name="`${criteria.slug1}+${criteria.slug2}`" type="range" :value="criteria_values[`${criteria.slug1}+${criteria.slug2}`]" min="0" max="16"
-                                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" @change="updateCriteriaValue(index, `${criteria.slug1}+${criteria.slug2}`)">
-                                            </div>
-                                        </template>
-                                    </div>
-                                </template>
-                            </div>
-
-                            {{-- RIGHT --}}
-                            <div class="flex flex-wrap flex-col gap-3">
                                 {{-- SELECT METHOD --}}
                                 <div>
                                     <select
@@ -109,6 +88,11 @@
                                         @endforeach
                                     </select>
                                 </div>
+                            </div>
+                            {{-- LEFT END --}}
+
+                            {{-- RIGHT --}}
+                            <div class="flex flex-wrap flex-col gap-3">
 
                                 {{-- SELECT CRITERIA --}}
                                 <div class="container-criterias">
@@ -145,8 +129,9 @@
 
                                                 <div>
                                                     {{-- <label for="small" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Small select</label> --}}
-                                                    <select 
-                                                        class="block w-full py-1 px-2 pr-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-w-max" name="type">
+                                                    <select
+                                                        class="block w-full py-1 px-2 pr-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-w-max"
+                                                        name="type">
                                                         <option value="cost" selected>Cost</option>
                                                         <option value="benefit">Benefit</option>
                                                     </select>
@@ -155,7 +140,26 @@
                                         </template>
                                     </div>
                                 </div>
+
+                                {{-- Count Criterias --}}
+                                <template x-if="Object.keys(criterias).length > 0">
+                                    <div class="container-weight">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Specify criteria <span class="text-xs">*select at least 3 criteria</span></label>
+                                        <template x-for="(criteria, index) in criterias.filter(c => c.status)">
+                                            <div class="flex flex-col mb-4 px-4 pt-2 pb-4 rounded-md border border-gray-700">
+                                                <div class="mb-3 grid grid-cols-11 gap-2">
+                                                    <p x-text="criteria.label1" class="col-span-5 flex items-center text-[0.9rem]"></p>
+                                                    <p x-text="weights[criteria.value]" class="col-span-1 aspect-square flex items-center border justify-center  border-gray-700 rounded-md"></p>
+                                                    <p x-text="criteria.label2" class="col-span-5 flex items-center text-[0.9rem]"></p>
+                                                </div>
+                                                <input :name="`${criteria.slug1}+${criteria.slug2}`" type="range" :value="criteria_values[`${criteria.slug1}+${criteria.slug2}`]" min="0" max="16"
+                                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" @change="updateCriteriaValue(index, `${criteria.slug1}+${criteria.slug2}`)">
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
                             </div>
+                            {{-- RIGHT END --}}
 
                         </div>
                     </div>
