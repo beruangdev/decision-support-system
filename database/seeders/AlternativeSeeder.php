@@ -19,7 +19,7 @@ class AlternativeSeeder extends Seeder
     public function run()
     {
         $alternatives = [];
-        for ($i = 0; $i < 200; $i++) {
+        for ($i = 0; $i < 500; $i++) {
             $faker = Faker::create('id_ID');
             $alternative = new Alternative();
             $alternative->name = $faker->name();
