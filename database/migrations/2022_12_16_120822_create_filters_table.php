@@ -17,8 +17,10 @@ return new class extends Migration
             $table->id();
             $table->string('key');
             $table->string('value');
-
+            $table->integer('order')->default(1);
+            
             $table->foreignId('calculate_id')->references('id')->on('calculates')->onDelete("cascade");
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete("cascade");
             $table->timestamps();
         });
     }

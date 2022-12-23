@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Alternative;
 use App\Models\AlternativeTaxonomie;
 use App\Models\Method;
+use App\Models\ProjectMethod;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\Datatables\Datatables;
@@ -76,27 +77,29 @@ class ProjectController extends Controller
      * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function show(Project $project)
+    public function show($project_id)
     {
-        // dd($keys);
         $methods = Method::all();
         $alternative_taxonomy_keys = AlternativeTaxonomie::distinct("key_slug")->get(["key", "key_slug"]);
-        // dd($alternative_taxonomy_keys);
-        // dd($sql_select);
 
-        // $alternatives = $this->alternative_query_1($alternative_taxonomy_keys);
-        // $alternatives = $this->alternative_query_2($alternative_taxonomy_keys);
-        // $alternatives = $this->alternative_query_3($alternative_taxonomy_keys);
-        // $alternatives = $this->alternative_query_4($alternative_taxonomy_keys);
+        return view("pages.project.show", compact("project_id", "methods", "alternative_taxonomy_keys"));
+    }
 
-        // $alternatives = $alternatives->limit(10);
-        // $alternatives = $alternatives->get();
-        // $alternatives = $alternatives->paginate(10);
-        // $alternatives = $alternatives->toSql();
+    public function show_list($project_id)
+    {
+        // $project = Project::where("id", $project_id)->with(["project_methods"])->firstOrfail();
+        $project_methods = ProjectMethod::where("project_id", $project_id)->with(["method"])->latest()->get();
 
-        // dd($alternatives);
-        
-        return view("pages.project.show", compact("project", "methods", "alternative_taxonomy_keys"));
+        return Datatables::of($project_methods)
+            ->addIndexColumn()
+            ->addColumn('method', function ($project_method) {
+                return $project_method->method->name;
+            })
+            ->addColumn('action', function ($project_method) {
+                return view("pages.project.components.show-table-button-action", compact("project_method"));
+            })
+            ->rawColumns(['action', "method"])
+            ->make(true);
     }
 
     public function alternative_query_1($alternative_taxonomy_keys)
@@ -248,9 +251,8 @@ class ProjectController extends Controller
      * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Project $project)
+    public function destroy($project_id)
     {
-        $project->delete();
-        return response()->json(true);
+        return response()->json(Project::where("id", $project_id)->delete());
     }
 }

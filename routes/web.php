@@ -35,12 +35,17 @@ Route::middleware('auth')->group(function () {
 
 
     Route::get("project/list", [ProjectController::class, "list"])->name("project.list");
+    Route::get("project/show/list/{project_id}", [ProjectController::class, "show_list"])->name("project.show.list");
     Route::resource("project", ProjectController::class);
     Route::get("alternative/list", [AlternativeController::class, "list"])->name("alternative.list");
     Route::resource("alternative", AlternativeController::class);
 
 
-    Route::get("project_method/create/{project_id}", [ProjectMethodController::class, "create"])->name("project_method.create");
+    Route::post("project_method/{project_id}", [ProjectMethodController::class, "store"])->name("project_method.store");
+    Route::resource("project_method", ProjectMethodController::class)->except([
+        'store'
+    ]);
+
 });
 
 require __DIR__ . '/auth.php';

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('criteria_id_1')->references('id')->on('criterias')->onDelete("cascade");
             $table->foreignId('criteria_id_2')->references('id')->on('criterias')->onDelete("cascade");
             $table->float('rasio');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete("cascade");
             $table->timestamps();
         });
     }

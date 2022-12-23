@@ -13,6 +13,8 @@ import "./scripts/project/project-edit"
 import "./scripts/project/project-delete"
 
 import "./scripts/project-method/project-method-create"
+import "./scripts/project-method/project-method-edit"
+import "./scripts/project-method/project-method-delete"
 
 import "./vendor/flowbite/dropdown"
 

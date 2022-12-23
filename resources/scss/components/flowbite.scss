@@ -20,3 +20,8 @@
         @apply block;
     }
 }
+
+// Modal
+[modal-backdrop]{
+    @apply bg-gray-900/60;
+}

@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('criterias', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('slug');
             $table->string('type');
             $table->foreignId('project_method_id')->references('id')->on('project_methods')->onDelete("cascade");
             $table->foreignId('user_id')->references('id')->on('users');

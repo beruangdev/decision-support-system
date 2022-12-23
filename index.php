@@ -1,5 +1,5 @@
 <?php
-
+// pnpm build; git add .; git commit -m "feat: edit project method"; git push
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 

@@ -165,9 +165,8 @@ class AlternativeController extends Controller
      * @param  \App\Models\Alternative  $alternative
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Alternative $alternative)
+    public function destroy( $alternative_id)
     {
-        $alternative->delete();
-        return response()->json(true);
+        return response()->json(Alternative::where("id", $alternative_id)->delete());
     }
 }

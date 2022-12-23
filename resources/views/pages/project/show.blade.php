@@ -5,7 +5,7 @@
                 <div class="p-6 text-gray-900">
 
                     {{--  --}}
-                    <div class="flex flex-wrap w-full">
+                    <div class="flex flex-wrap w-full mb-6">
                         <x-dropdown-link data-modal-toggle="modal-create-project-method"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 w-fit">
                             {{ __('Add Method') }}
@@ -13,23 +13,76 @@
                     </div>
                     {{--  --}}
 
+                    <table class="setup-datatable stripe hover display" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th class="min-w-[10rem] md:min-w-[15rem]">Name</th>
+                                <th>Description</th>
+                                <th>Method</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        {{-- <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th></th>
+                        </tr>
+                    </tfoot> --}}
+                    </table>
+
                 </div>
             </div>
         </div>
     </div>
 </x-app-layout>
 
+<script type="text/javascript">
+    $(function() {
+        if (document.querySelector(".setup-datatable")) {
+            var table_project_show = $('.setup-datatable').DataTable({
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                deferRender: true,
+                ajax: "{{ route('project.show.list', $project_id) }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                    },
+                    {
+                        data: 'name',
+                        name: 'name',
+                    },
+                    {
+                        data: 'description',
+                        name: 'description',
+                    },
+                    {
+                        data: 'method',
+                        name: 'method',
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
+                ],
+            });
 
-<script>
-    $(document).ready(function() {
-        document.querySelector(`a[data-modal-toggle="modal-create-project-method"]`).click()
+            window.table_project_show = table_project_show
+        }
     });
 </script>
 
 {{-- Modal Create Project Method --}}
 
 <div id="modal-create-project-method" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full" data-modal-placement="center-center">
-    <div class="relative w-full h-full max-w-7xl md:h-auto">
+    <div class="relative w-full h-full max-w-7xl md:h-auto max-h-[88vh] overflow-y-auto">
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-800">
             <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
@@ -52,7 +105,7 @@
                     {{ __('Add Method') }}
                 </h2>
 
-                <form action="{{ route('project_method.create', $project->id) }}" data-alternative_taxonomy_keys='@json($alternative_taxonomy_keys)' x-data="createProjectMethod($el)" x-init="init" @submit.prevent="submit">
+                <form action="{{ route('project_method.store', $project_id) }}" data-alternative_taxonomy_keys='@json($alternative_taxonomy_keys)' x-data="createProjectMethod($el)" x-init="init" @submit.prevent="submit">
 
                     <div class="container-error text-red-600 my-3">
                         <p class="error-header">&nbsp;</p>
@@ -62,18 +115,18 @@
 
                     <div class="container-input-project-method">
 
-                        <div class="mb-2 md:mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="mb-2 md:mb-4 grid grid-cols-1 md:grid-cols-12 gap-3">
 
                             {{-- LEFT --}}
-                            <div class="flex flex-wrap flex-col gap-3">
+                            <div class="flex flex-wrap flex-col gap-3 md:col-span-4">
                                 {{-- NAME --}}
                                 <div>
-                                    <x-input-float value="" label-text="Name" label-class="" name="name" />
+                                    <x-input-float value="" label-text="Name" label-class="" name="name" x-model="body.name" />
                                 </div>
 
                                 {{-- DESCRIPTION --}}
                                 <div>
-                                    <x-textarea-float name="description" label-text="Description" rows="4">
+                                    <x-textarea-float name="description" label-text="Description" rows="4" x-model="body.description">
                                     </x-textarea-float>
                                 </div>
 
@@ -81,10 +134,10 @@
                                 <div>
                                     <select
                                         class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        name="method">
+                                        name="method_id" x-model="body.method_id">
                                         <option selected disabled value="">--- Choice method you want to use ----</option>
                                         @foreach ($methods as $method)
-                                            <option value="{{ $method->slug }}">{{ $method->name }}</option>
+                                            <option value="{{ $method->id }}">{{ $method->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -92,20 +145,12 @@
                             {{-- LEFT END --}}
 
                             {{-- RIGHT --}}
-                            <div class="flex flex-wrap flex-col gap-3">
+                            <div class="flex flex-wrap flex-col gap-3 md:col-span-8">
 
                                 {{-- SELECT CRITERIA --}}
                                 <div class="container-criterias">
                                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choice criteria <span class="text-xs">*select at least 3 criteria</span></label>
                                     <div class="grid lg:grid-cols-2 gap-2">
-
-                                        {{-- @foreach ($alternative_taxonomy_keys as $key)
-                                            <div class="flex items-center pl-4 rounded border border-gray-200 dark:border-gray-700">
-                                                <input id="checkbox-method-criteria-{{ $key }}" type="checkbox" value="{{ $key->key_slug }}" name="criterias"
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                                <label for="checkbox-method-criteria-{{ $key }}" class="py-4 ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300">{{ $key->key }}</label>
-                                            </div>
-                                        @endforeach --}}
 
                                         <template x-for="(atk, index) in alternative_taxonomy_keys" :key="index" @change.prevent="updateAlternativeTaxonomyKeys">
                                             <div class="container-criteria-item flex items-center justify-between px-4 py-2 rounded border border-gray-200 dark:border-gray-700">
@@ -141,16 +186,19 @@
                                     </div>
                                 </div>
 
-                                {{-- Count Criterias --}}
+                                {{-- Specify Criterias Rasio --}}
                                 <template x-if="Object.keys(criterias).length > 0">
                                     <div class="container-weight">
-                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Specify criteria <span class="text-xs">*select at least 3 criteria</span></label>
+                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Specify criteria rasio<span class="text-xs">*select at least 3 criteria</span></label>
                                         <template x-for="(criteria, index) in criterias.filter(c => c.status)">
                                             <div class="flex flex-col mb-4 px-4 pt-2 pb-4 rounded-md border border-gray-700">
-                                                <div class="mb-3 grid grid-cols-11 gap-2">
-                                                    <p x-text="criteria.label1" class="col-span-5 flex items-center text-[0.9rem]"></p>
-                                                    <p x-text="weights[criteria.value]" class="col-span-1 aspect-square flex items-center border justify-center  border-gray-700 rounded-md"></p>
-                                                    <p x-text="criteria.label2" class="col-span-5 flex items-center text-[0.9rem]"></p>
+                                                <div class="mb-3 grid grid-cols-12 md:grid-cols-11 gap-2">
+
+                                                    <p x-text="criteria.label1" class="col-span-5 md:col-span-5 text-[0.9rem]"></p>
+
+                                                    <p x-text="weights[criteria.value]" class="col-span-2 md:col-span-1 aspect-square flex items-center border justify-center  border-gray-700 rounded-md w-[2rem]"></p>
+
+                                                    <p x-text="criteria.label2" class="col-span-5 md:col-span-5 text-[0.9rem]"></p>
                                                 </div>
                                                 <input :name="`${criteria.slug1}+${criteria.slug2}`" type="range" :value="criteria_values[`${criteria.slug1}+${criteria.slug2}`]" min="0" max="16"
                                                     class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" @change="updateCriteriaValue(index, `${criteria.slug1}+${criteria.slug2}`)">
@@ -165,7 +213,7 @@
                     </div>
 
                     <div class="mt-6 mb-6 flex justify-end">
-                        <x-secondary-button data-modal-toggle="modal-create-project-method">
+                        <x-secondary-button data-modal-toggle="modal-create-project-method" class="close-modal">
                             {{ __('Cancel') }}
                         </x-secondary-button>
 
