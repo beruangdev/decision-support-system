@@ -25,7 +25,7 @@ class AlternativeController extends Controller
 
     public function list($project_id)
     {
-        $data = Alternative::where("user_id", Auth::id())->with(["alternative_taxonomies"])->get();
+        $data = Alternative::where("user_id", Auth::id())->where("project_id", $project_id)->with(["alternative_taxonomies"])->get();
         return Datatables::of($data)
             ->addIndexColumn()
             ->addColumn('name', function ($alternative) use ($project_id) {
