@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('taxonomie_strings')->nullable();
 
             $table->foreignId('user_id')->references('id')->on('users');
+            $table->foreignId('project_id')->references('id')->on('projects');
             $table->timestamps();
         });
     }

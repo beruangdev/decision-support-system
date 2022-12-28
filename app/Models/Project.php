@@ -26,6 +26,11 @@ class Project extends Model
         return $this->hasMany(ProjectMethod::class);
     }
 
+    public function alternatives()
+    {
+        return $this->hasMany(Alternative::class);
+    }
+
     public function user()
     {
         return $this->hasMany(User::class);

@@ -1,4 +1,20 @@
 /*Overrides for Tailwind CSS */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .dataTables_paginate {
+    @apply text-gray-700 dark:text-gray-300;
+}
+
+main .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    @apply text-gray-700/30 dark:text-gray-300/30 #{!important};
+}
+
+// headers
+// .dataTables_wrapper thead tr {
+//     @apply bg-gray-200 text-sm dark:bg-gray-900;
+// }
 
 /*Form fields*/
 .dataTables_wrapper select,
@@ -58,8 +74,6 @@ table.dataTable.display tbody tr {
     /*border border-transparent*/
 }
 
-
-
 /*Add padding to bottom border */
 table.dataTable.no-footer {
     border-bottom: 1px solid #e2e8f0;
@@ -75,6 +89,6 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child:before {
     /*bg-indigo-500*/
 }
 
-.dataTables_wrapper .dataTables_length select{
+.dataTables_wrapper .dataTables_length select {
     @apply pr-10;
 }

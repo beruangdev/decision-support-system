@@ -79,10 +79,7 @@ class ProjectController extends Controller
      */
     public function show($project_id)
     {
-        $methods = Method::all();
-        $alternative_taxonomy_keys = AlternativeTaxonomie::distinct("key_slug")->get(["key", "key_slug"]);
-
-        return view("pages.project.show", compact("project_id", "methods", "alternative_taxonomy_keys"));
+        return view("pages.project.show", compact("project_id"));
     }
 
     public function show_list($project_id)
@@ -95,8 +92,8 @@ class ProjectController extends Controller
             ->addColumn('method', function ($project_method) {
                 return $project_method->method->name;
             })
-            ->addColumn('action', function ($project_method) {
-                return view("pages.project.components.show-table-button-action", compact("project_method"));
+            ->addColumn('action', function ($project_method) use ($project_id) {
+                return view("pages.project.components.show-table-button-action", compact("project_method", "project_id"));
             })
             ->rawColumns(['action', "method"])
             ->make(true);

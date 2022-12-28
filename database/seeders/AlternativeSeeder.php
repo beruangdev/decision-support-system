@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Alternative;
 use App\Models\AlternativeTaxonomie;
+use App\Models\Project;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -18,12 +19,14 @@ class AlternativeSeeder extends Seeder
      */
     public function run()
     {
+        $project_count = Project::count();
         $alternatives = [];
-        for ($i = 0; $i < 500; $i++) {
+        for ($i = 0; $i < intval(env("ALTERNATIVE_COUNT", 500)); $i++) {
             $faker = Faker::create('id_ID');
             $alternative = new Alternative();
             $alternative->name = $faker->name();
             $alternative->description = $faker->paragraph($faker->numberBetween(1, 5));
+            $alternative->project_id = $faker->numberBetween(1, $project_count);
             $alternative->user_id = 1;
             $alternative->save();
             array_push($alternatives, $alternative);

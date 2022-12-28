@@ -13,7 +13,7 @@ window.createProjectMethod = function (element) {
         input_selector: `.container-input-project-method input[type="text"], .container-input-project-method textarea, .container-input-project-method select, .container-input-project-method input[type="checkbox"]`,
 
         async init() {
-            console.log("init");
+            console.log("INITIALIZE: createProjectMethod()");
             this.alternative_taxonomy_keys = JSON.parse(element.getAttribute("data-alternative_taxonomy_keys"))
 
             this.alternative_taxonomy_keys = this.alternative_taxonomy_keys.sort((a, b) => a.key_slug.localeCompare(b.key_slug));
@@ -190,7 +190,7 @@ window.createProjectMethod = function (element) {
             element.querySelectorAll(`.container-criterias input[type="checkbox"][name="criterias"]`).forEach(input => input.checked = false)
         },
         updateAlternativeTaxonomyKeys(atk, index) {
-            console.log("CHANGE");
+            console.log("CHANGEEE");
 
             this.criterias = []
             // INIT Criteria

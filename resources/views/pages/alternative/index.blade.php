@@ -34,7 +34,7 @@
 
 {{-- Modal EDIT Alternative --}}
 <x-modal name="modal-edit-alternative" focusable>
-    <form method="post" action="{{ route('alternative.index') }}" class="p-6 form-edit-alternative" x-data="editAltenative($el)" x-init="init" @submit.prevent="submitEditAltenative">
+    <form method="post" action="{{ route('alternative.index', ['project' => Route::input('project')]) }}" class="p-6 form-edit-alternative" x-data="editAltenative($el)" x-init="init" @submit.prevent="submitEditAltenative">
         @csrf
 
         <h2 class="text-lg font-medium text-gray-900 flex flex-wrap">
@@ -136,7 +136,7 @@
                 processing: true,
                 serverSide: true,
                 deferRender: true,
-                ajax: "{{ route('alternative.list') }}",
+                ajax: "{{ route('alternative.list', ['project' => Route::input('project')]) }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',

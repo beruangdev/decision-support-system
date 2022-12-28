@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ join(" ", explode("_", config('app.name', 'Laravel'))) }}</title>
+    <title>{{ join(' ', explode('_', config('app.name', 'Laravel'))) }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Fonts -->

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug');
             $table->string('type');
+            $table->boolean('checked')->default(true);
             $table->foreignId('project_method_id')->references('id')->on('project_methods')->onDelete("cascade");
             $table->foreignId('user_id')->references('id')->on('users');
             $table->timestamps();

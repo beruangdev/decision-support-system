@@ -1,9 +1,16 @@
+window.alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 window.editProjectMethod = function (element) {
     return {
         element,
         alternative_taxonomy_keys: [],
         old_value: [],
-        body: {},
+        body: {
+            name: "",
+            description: "",
+            method_id: "",
+            criterias: [],
+            criteria_rasios: [],
+        },
         inputs: {},
         criterias: [],
         criteria_values: {},
@@ -81,54 +88,104 @@ window.editProjectMethod = function (element) {
         input_selector: `.container-input-project-method input[type="text"], .container-input-project-method textarea, .container-input-project-method select, .container-input-project-method input[type="checkbox"]`,
 
         async init() {
-            console.log("init");
+            console.log("INITIALIZE: editProjectMethod()");
 
             this.old_value = JSON.parse(element.getAttribute("data-old_value"))
             this.old_value = this.old_value;
 
-            this.alternative_taxonomy_keys = JSON.parse(element.getAttribute("data-alternative_taxonomy_keys"))
-            this.alternative_taxonomy_keys = this.alternative_taxonomy_keys.sort((a, b) => a.key_slug.localeCompare(b.key_slug))
-
-
-            this.alternative_taxonomy_keys = this.alternative_taxonomy_keys
-                .map(atk => {
-                    let checked = false;
-                    let type = "cost";
-
-                    let criterias = this.old_value.criterias.filter(criteria => criteria.slug == atk.key_slug)
-                    if (criterias.length > 0) {
-                        let criteria = criterias[0]
-                        checked = true
-                        type = criteria.type
-                    }
-                    return {
-                        ...atk,
-                        checked,
-                        type
-                    }
-                })
-
-            console.log("old_value", this.get(this.old_value));
-            console.log("alternative_taxonomy_keys", this.get(this.alternative_taxonomy_keys));
             // await new Promise((r) => setTimeout(r, 100))
             window.onload = () => {
-                this.pull_input_values()
-                this.updateAlternativeTaxonomyKeys()
+                console.log("old_value", this.get(this.old_value));
+                // console.log("alternative_taxonomy_keys", this.get(this.alternative_taxonomy_keys));
+                this.init_body_values()
                 console.log("body", this.get(this.body));
-                console.log("inputs", this.get(this.inputs));
-                console.log("criterias", this.get(this.criterias));
+                // console.log("inputs", this.get(this.inputs));
+                // console.log("criterias", this.get(this.criterias));
+                this.calculateMethod()
             }
+        },
+        init_body_values() {
+            this.body.name = this.old_value.name
+            this.body.description = this.old_value.description
+            this.body.method_id = this.old_value.method_id
+
+            // Init Criterias
+            this.body.criterias = this.old_value.criterias.map(({ name, slug, type, checked }, index) => {
+                return {
+                    name, slug, type, checked: checked == 0 ? false : true
+                }
+            })
+
+            JSON.parse(element.getAttribute("data-alternative_taxonomy_keys")).forEach((atk) => {
+                let criterias = this.old_value.criterias.filter(criteria => criteria.slug == atk.key_slug)
+                if (criterias.length == 0) {
+                    this.body.criterias.push({
+                        name: atk.key,
+                        slug: atk.key_slug,
+                        checked: false,
+                        type: "cost"
+                    })
+                }
+            })
+            this.body.criterias = this.body.criterias.sort((a, b) => a.slug.localeCompare(b.slug))
+
+            let initial_index = 0
+            this.body.criterias = this.body.criterias.map((criteria) => {
+                let initial = ""
+                if (criteria.checked) {
+                    initial = alphabet[initial_index]
+                    initial_index++
+                }
+                return {
+                    ...criteria, initial
+                }
+            })
+
+            // draw criteria initial
+            let criteria_initial_html = ""
+            this.body.criterias.filter(c => c.checked).forEach(c => {
+                criteria_initial_html += `<li class="text-sm">${c.initial} &nbsp; = &nbsp; ${c.name}</li>`
+            })
+            document.querySelector(".criteria-initial").innerHTML = criteria_initial_html
+
+            // Init Criteria Rasios
+            // this.body.criteria_rasios
+            let criteria_rasio_json = JSON.parse(this.old_value.criteria_rasio_json)
+            // console.log(criteria_rasio_json);
+            this.body.criterias.forEach((criteria1, index1) => {
+                this.body.criterias.forEach((criteria2, index2) => {
+                    if (index1 < index2) {
+                        let cr = {
+                            names: [criteria1.name, criteria2.name],
+                            slugs: [criteria1.slug, criteria2.slug],
+                            value: 0,
+                            checked: criteria1.checked && criteria2.checked,
+                        }
+                        let value = criteria_rasio_json.filter(({ slugs }) => slugs[0] == cr.slugs[0] && slugs[1] == cr.slugs[1])[0]
+
+                        if (value) {
+                            cr.value = this.weights.findIndex((val, index) => {
+                                return val.value == value.rasio
+                            })
+                        }
+                        this.body.criteria_rasios.push(cr)
+                    }
+                })
+            })
         },
         submit() {
             console.log("submit");
-            this.pull_input_values()
-            if (!this.validate()) return false
+            // this.pull_input_values()
+            // if (!this.validate()) return false
             let body = this.get(this.body)
-            // get rasio
-            body.criteria_rasios = this.pull_input_criteria_rasio_values()
-
-            delete body.type
-
+            // body.criterias = body.criterias.filter(c => c.checked)
+            body.criteria_rasios = body.criteria_rasios.filter(c => c.checked)
+            body.criteria_rasios = body.criteria_rasios.map(cr => {
+                return {
+                    ...cr,
+                    rasio: this.weights[cr.value].value
+                }
+            })
             console.log("body", body);
             // element.submit()
             this.ajax(body)
@@ -137,71 +194,6 @@ window.editProjectMethod = function (element) {
 
             console.log("submit done");
 
-        },
-        pull_input_criteria_rasio_values() {
-            let criteria_rasios = []
-            element.querySelectorAll(`.container-weight input[type="range"]`).forEach(el => {
-                let rasio = this.weights[parseInt(el.value)].label
-                if (typeof rasio == "string" && rasio.includes("/")) {
-                    let rr = rasio.split("/")
-                    rasio = parseInt(rr[0]) / parseInt(rr[1])
-                }
-                console.log("typeof rasio", typeof rasio);
-
-                criteria_rasios.push({
-                    slugs: el.name.split("+"),
-                    rasio
-                })
-            })
-            return criteria_rasios
-        },
-        pull_input_values() {
-            this.inputs = {}
-            this.body = {}
-            element.querySelectorAll(this.input_selector).forEach(input => {
-                const default_inputs_value = {
-                    value: input.value,
-                    element: input,
-                    error: false,
-                    message: "",
-                    min_length: 1
-                }
-
-                // console.log("default_inputs_value", input.name, input.getAttribute("data-value") ?? "");
-                if (input.name != "criterias" && input.name != "type") {
-                    this.inputs[input.name] = default_inputs_value
-                    this.body[input.name] = input.getAttribute("data-value") ?? ""
-                } else if (input.name == "criterias") {
-                    let default_value = {
-                        name: input.value,
-                        checked: input.checked,
-                        type: input.closest(".container-criteria-item").querySelector(`[name="type"]`).value
-                    }
-                    if (!this.inputs[input.name]) {
-                        this.inputs[input.name] = {
-                            ...default_inputs_value,
-                            value: [default_value],
-                            element: [input],
-                            min_length: 3
-                        }
-                    } else {
-                        this.inputs[input.name].value.push(default_value)
-                        this.inputs[input.name].element.push(input)
-                    }
-
-                    if (input.checked) {
-                        function get_criteria_value(input) {
-                            return {
-                                name: input.parentElement.querySelector("label").innerText,
-                                slug: input.value,
-                                type: input.closest(".container-criteria-item").querySelector(`[name="type"]`).value
-                            }
-                        }
-                        if (!this.body[input.name]) this.body[input.name] = [get_criteria_value(input)]
-                        else this.body[input.name].push(get_criteria_value(input))
-                    }
-                }
-            });
         },
         get(obj) {
             return JSON.parse(JSON.stringify(obj))
@@ -280,85 +272,283 @@ window.editProjectMethod = function (element) {
 
             element.querySelectorAll(`.container-criterias input[type="checkbox"][name="criterias"]`).forEach(input => input.checked = false)
         },
-        get_criteria_by_slug(slug) {
-            let criterias = this.old_value.criterias.filter(criteria => {
-                return criteria.slug == slug
+        onCriteriaUpdate(index, criteria1) {
+            console.log("CHANGE onCriteriaUpdate");
+            let initial_index = 0
+            // update criteria initial
+            this.body.criterias = this.body.criterias.map((criteria) => {
+                let initial = ""
+                if (criteria.checked) {
+                    initial = alphabet[initial_index]
+                    initial_index++
+                }
+                return {
+                    ...criteria, initial
+                }
             })
 
-            if (criterias.length == 0) return null
-            return criterias[0]
-        },
-        updateAlternativeTaxonomyKeys() {
-            console.log("CHANGE");
-
-            this.criterias = []
-            // INIT Criteria
-            let actives = []
-            let selector = `.container-criterias input[type='checkbox'][name="criterias"]:checked`
-            this.element.querySelectorAll(selector).forEach((el) => {
-                actives.push({
-                    slug: el.value,
-                    label: el.parentElement.querySelector("label").innerText
-                })
-            })
-
-            actives.forEach(({ slug: slug1, label: label1 }, index1) => {
-                actives.forEach(({ slug: slug2, label: label2 }, index2) => {
-                    if (index1 < index2) {
-                        if (this.criteria_values[`${slug1}+${slug2}`] == undefined) {
-                            let criteria_value = 0
-
-                            let id1 = this.get_criteria_by_slug(slug1)
-                            let id2 = this.get_criteria_by_slug(slug2)
-
-                            if (id1 && id2) {
-                                let old_criteria_values = JSON.parse(this.old_value.criteria_rasio_json).filter(crj => {
-                                    return crj.criteria_id_1 == id1.id && crj.criteria_id_2 == id2.id
-                                })
-                                if (old_criteria_values.length > 0) {
-                                    let old_criteria_value = old_criteria_values[0]
-                                    criteria_value = old_criteria_value.rasio
-                                    criteria_value = this.weights.findIndex(weight => {
-                                        return weight.value == criteria_value
-                                    });
-                                }
-                            }
-
-                            this.criteria_values[`${slug1}+${slug2}`] = criteria_value
-                        }
-                        let filter = this.criterias.filter(criteria => criteria.slug1 == slug1 && criteria.slug1 == slug2).length == 0;
-                        if (filter) {
-                            this.criterias.push({
-                                value: this.criteria_values[`${slug1}+${slug2}`],
-                                label1,
-                                label2,
-                                slug1,
-                                slug2,
-                                status: true,
-                            })
-                        }
-                    }
-                });
+            this.body.criteria_rasios.forEach((cr, index) => {
+                if (cr.slugs.includes(criteria1.slug)) {
+                    let criteria2_slug = cr.slugs[cr.slugs.indexOf(criteria1.slug) == 0 ? 1 : 0]
+                    let criteria2 = this.body.criterias.filter(criteria => {
+                        return criteria.slug == criteria2_slug
+                    })[0]
+                    this.body.criteria_rasios[index].checked = criteria1.checked && criteria2.checked
+                }
             });
 
-            console.log("this.criteria_values", this.get(this.criteria_values));
-            console.log("this.criterias", this.get(this.criterias));
+            console.log("criterias", this.get(this.body.criterias));
+            this.calculateMethod()
         },
-        updateCriteriaValue(index, input_name) {
-            console.log("updateCriteriaValue");
-            let el = element.querySelector(`input[name='${input_name}']`)
-            if (!el) {
-                console.log("ELEMENT TIDAK ADA", el, input_name);
-                return false
+        getRasioWeightLabel(index, criteria) {
+            let result = ""
+            if (index == 0) {
+                result = this.weights[criteria.value].label
+            } else {
+                if (criteria.value == 0) {
+                    result = 1
+                } else {
+                    let seek = 8
+                    if (parseInt(criteria.value) > 8) seek = 9
+                    result = this.getCircularArray(this.weights, parseInt(criteria.value) + seek).label
+                }
+            }
+            return result
+        },
+        getCircularArray(arr, diff, current = 0) {
+            let newIndex = (current + diff) % arr.length;
+            if (newIndex < 0) newIndex = arr.length + newIndex;
+            return arr[newIndex];
+        },
+        onChangeRasio() {
+            this.calculateMethod()
+        },
+        calculateMethod() {
+            console.log(`START calculateMethod`);
+            // make table
+            let table_values = []
+            let rasios = this.get(this.body.criteria_rasios.filter(r => r.checked))
+            let criterias = this.get(this.body.criterias.filter(r => r.checked))
+
+            criterias.forEach((criteria1, index1) => {
+                table_values[index1] = []
+                criterias.forEach((criteria2, index2) => {
+                    if (criteria1.slug == criteria2.slug) {
+                        table_values[index1].push(1)
+                    } else {
+                        let rasio = rasios.filter(r => r.slugs[0] == criteria1.slug && r.slugs[1] == criteria2.slug)
+                        if (rasio.length > 0) {
+                            let value = this.getCircularArray(this.weights, parseInt(rasio[0].value)).value
+                            table_values[index1].push(value)
+                        } else {
+                            let rasio = rasios.filter(r => r.slugs[0] == criteria2.slug && r.slugs[1] == criteria1.slug)
+                            let seek = Math.floor(this.weights.length / 2)
+                            if (parseInt(rasio[0].value) > 8) seek = Math.floor(this.weights.length / 2) + 1
+                            let value = this.getCircularArray(this.weights, parseInt(rasio[0].value + seek)).value
+                            if (parseInt(rasio[0].value) == 0) value = 1
+                            table_values[index1].push(value)
+                        }
+                    }
+                })
+            })
+            // console.table_values(table_values);
+
+            // draw criteria initial
+            let criteria_initial_html = ""
+            criterias.forEach(c => {
+                criteria_initial_html += `<li>${c.initial} = ${c.name}</li>`
+            })
+            document.querySelector(".criteria-initial").innerHTML = criteria_initial_html
+
+            // draw table_values
+            let ahp_result = ahp({
+                values: table_values
+            })
+            ahp_result.init()
+
+            function isFloat(n) {
+                return Number(n) === n && n % 1 !== 0;
             }
 
-            let value = parseInt(el.value)
-            this.criterias[index].value = value
-            this.criteria_values[input_name] = value
+            function cleanFloatAndInt(values) {
+                function parse(value) {
+                    if (isFloat(value)) {
+                        let limit_decimal = 3
+                        let decimal_length = value.toString().split(".")[1].length
+                        if (decimal_length <= limit_decimal) {
+                            return value
+                        }
+                        return value.toFixed(limit_decimal)
+                    }
+                    return value
+                }
+
+                return values.map(value => {
+                    if (Array.isArray(value)) {
+                        return value.map(value => {
+                            return parse(value)
+                        })
+                    }
+
+                    return parse(value)
+                })
+            }
+
+            function injectCriteriaHeaders(arrays, body_criterias) {
+                if (Array.isArray(arrays[0])) {
+                    arrays.forEach((array, index) => {
+                        arrays[index] = [body_criterias[index].initial, ...array]
+                    })
+                } else {
+
+                }
+                return arrays
+            }
+
+            let datatable_default_config = {
+                searching: false,
+                ordering: false,
+                paging: false,
+                info: false,
+                stateSave: true,
+                bDestroy: true,
+                destroy: true,
+                retrieve: true,
+                processing: true,
+            }
+
+            // table-comparison-matrix
+            let selector = ""
+            let data = ""
+            let columns = ""
+
+            selector = "#table-comparison-matrix"
+            if ($.fn.DataTable.isDataTable(selector)) {
+                $(selector).DataTable().clear().destroy();
+                $(selector).html("")
+            }
+            columns = [{ title: "Criteria" }, ...criterias.map(c => {
+                return {
+                    title: c.initial
+                }
+            })]
+
+            data = [...injectCriteriaHeaders(cleanFloatAndInt(table_values), criterias), ...[["", ...cleanFloatAndInt(ahp_result.eigen_vektor_normalisasi.results)]]]
+
+            $(selector).DataTable({
+                ...datatable_default_config,
+                data,
+                columns,
+                initComplete: function () {
+                    // console.log(`Datatable initComplete`);
+                    this.api().tables().header().to$().addClass('bg-gray-200 text-sm dark:bg-gray-900')
+
+                    this.api().columns(':first').nodes().flatten().to$().addClass('bg-gray-200 dark:bg-gray-900')
+
+                    $(this.api().row(':last').node()).addClass("!bg-gray-200 dark:!bg-gray-900")
+                },
+            });
 
 
-            console.log("this.criteria_values", this.get(this.criteria_values));
-            console.log("this.criterias", this.get(this.criterias));
+            // table-weight
+            selector = "#table-weight"
+            if ($.fn.DataTable.isDataTable(selector)) {
+                $(selector).DataTable().clear().destroy();
+                $(selector).html("")
+            }
+            columns = [{ title: "Criteria" }, ...criterias.map(c => {
+                return {
+                    title: c.initial
+                }
+            }), { title: "Weight" }]
+
+            data = ahp_result.normalisasi.values
+            ahp_result.normalisasi.weight.forEach((weight, index) => {
+                data[index].unshift(criterias[index].initial)
+                data[index].push(weight)
+            })
+            data = cleanFloatAndInt(data)
+
+            $(selector).DataTable({
+                ...datatable_default_config,
+                data,
+                columns,
+                initComplete: function () {
+                    // console.log(`Datatable initComplete`);
+                    this.api().tables().header().to$().addClass('bg-gray-200 text-sm dark:bg-gray-900')
+
+                    this.api().columns(':first, :last').nodes().flatten().to$().addClass('bg-gray-200 dark:bg-gray-900')
+
+                    $(this.api().row(':last').node()).addClass("!bg-gray-200 dark:!bg-gray-900")
+                },
+            });
+
+            // table-lambda
+            selector = "#table-lambda"
+            if ($.fn.DataTable.isDataTable(selector)) {
+                $(selector).DataTable().clear().destroy();
+                $(selector).html("")
+            }
+            columns = [{ title: "Criteria" }, ...criterias.map(c => {
+                return {
+                    title: c.initial
+                }
+            }), { title: "Lambda Maxs" }]
+
+            data = ahp_result.values_normal_weight.values
+
+            ahp_result.values_normal_weight.totals.forEach((weight, index) => {
+                data[index].unshift(criterias[index].initial)
+                data[index].push(weight)
+            })
+
+            data = cleanFloatAndInt(data)
+
+            $(selector).DataTable({
+                ...datatable_default_config,
+                data,
+                columns,
+                initComplete: function () {
+                    // console.log(`Datatable initComplete`);
+                    this.api().tables().header().to$().addClass('bg-gray-200 text-sm dark:bg-gray-900')
+
+                    this.api().columns(':first, :last').nodes().flatten().to$().addClass('bg-gray-200 dark:bg-gray-900')
+
+                    $(this.api().row(':last').node()).addClass("!bg-gray-200 dark:!bg-gray-900")
+                },
+            });
+
+
+
+            // table-check-consistency
+            selector = "#table-check-consistency"
+            if ($.fn.DataTable.isDataTable(selector)) {
+                $(selector).DataTable().clear().destroy();
+                $(selector).html("")
+            }
+            columns = [{ title: "Lambda Maxs" }, { title: "CI" }, { title: "CR" }]
+
+            // data = ahp_result.values_normal_weight.values
+            data = [
+                cleanFloatAndInt([ahp_result.lambda, ahp_result.ci, ahp_result.cr])
+            ]
+
+            $(selector).DataTable({
+                ...datatable_default_config,
+                data,
+                columns,
+                initComplete: function () {
+                    // console.log(`Datatable initComplete`);
+                    this.api().tables().header().to$().addClass('bg-gray-200 text-sm dark:bg-gray-900')
+
+                    // this.api().columns(':first, :last').nodes().flatten().to$().addClass('bg-gray-200 dark:bg-gray-900')
+
+                    // $(this.api().row(':last').node()).addClass("!bg-gray-200 dark:!bg-gray-900")
+                },
+            });
+
+
+            console.log("ahp_result", ahp_result);
         },
     }
 }

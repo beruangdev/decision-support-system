@@ -70,8 +70,10 @@ class ProjectMethodController extends Controller
             $criteria_rasio->save();
             $criteria_rasios->push($criteria_rasio);
             $criteria_rasio_json->push([
-                "criteria_id_1" => $criteria_rasio->criteria_id_1,
-                "criteria_id_2" => $criteria_rasio->criteria_id_2,
+                // "criteria_id_1" => $criteria_rasio->criteria_id_1,
+                // "criteria_id_2" => $criteria_rasio->criteria_id_2,
+                "ids" => [$criteria_rasio->criteria_id_1, $criteria_rasio->criteria_id_2],
+                "slugs" => [$req_criteria_rasio["slugs"][0], $req_criteria_rasio["slugs"][1]],
                 "rasio" => $criteria_rasio->rasio,
             ]);
         }
@@ -100,7 +102,7 @@ class ProjectMethodController extends Controller
      * @param  \App\Models\ProjectMethod  $project_method
      * @return \Illuminate\Http\Response
      */
-    public function edit($project_method_id)
+    public function edit($project_id, $project_method_id)
     {
         $project_method = ProjectMethod::where("id", $project_method_id)->with(["criterias", "criterias.criteria_rasio_1", "criterias.criteria_rasio_2"]);
         $project_method = $project_method->firstOrFail();
@@ -120,7 +122,7 @@ class ProjectMethodController extends Controller
      * @param  \App\Models\ProjectMethod  $project_method
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateProjectMethodRequest $request, $project_method_id)
+    public function update(UpdateProjectMethodRequest $request, $project_id, $project_method_id)
     {
         // return response()->json($request->all());
 
@@ -140,6 +142,7 @@ class ProjectMethodController extends Controller
                 $criteria->slug = $request_criteria["slug"];
                 $criteria->project_method_id = $project_method->id;
             }
+            $criteria->checked = $request_criteria["checked"];
             $criteria->type = $request_criteria["type"];
             $criteria->save();
             $criterias->push($criteria);
@@ -160,8 +163,8 @@ class ProjectMethodController extends Controller
             $criteria_rasio->save();
             $criteria_rasios->push($criteria_rasio);
             $criteria_rasio_json->push([
-                "criteria_id_1" => $criteria_rasio->criteria_id_1,
-                "criteria_id_2" => $criteria_rasio->criteria_id_2,
+                "ids" => [$criteria_rasio->criteria_id_1, $criteria_rasio->criteria_id_2],
+                "slugs" => [$req_crit_rasio["slugs"][0], $req_crit_rasio["slugs"][1]],
                 "rasio" => $criteria_rasio->rasio,
             ]);
         }
@@ -179,7 +182,7 @@ class ProjectMethodController extends Controller
      * @param  \App\Models\ProjectMethod  $project_method
      * @return \Illuminate\Http\Response
      */
-    public function destroy($project_method_id)
+    public function destroy($project_id ,$project_method_id)
     {
         return response()->json(ProjectMethod::where("id", $project_method_id)->delete());
     }

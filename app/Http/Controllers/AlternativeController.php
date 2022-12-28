@@ -23,15 +23,15 @@ class AlternativeController extends Controller
         return view("pages.alternative.index");
     }
 
-    public function list()
+    public function list($project_id)
     {
         $data = Alternative::where("user_id", Auth::id())->with(["alternative_taxonomies"])->get();
         return Datatables::of($data)
             ->addIndexColumn()
-            ->addColumn('name', function ($alternative) {
+            ->addColumn('name', function ($alternative) use ($project_id) {
                 $label = $alternative->name;
                 $attributes = collect([
-                    "href" => route("alternative.show", $alternative->id)
+                    "href" => route("alternative.show", ["project" => $project_id, "alternative" => $alternative->id])
                 ]);
                 return view("components.link", compact("label", "attributes"));
             })

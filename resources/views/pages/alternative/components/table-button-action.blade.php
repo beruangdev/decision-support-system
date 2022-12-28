@@ -16,7 +16,7 @@
                 </x-dropdown-link>
             </li>
             <li>
-                <x-dropdown-link href="{{ route('alternative.destroy', $alternative->id) }}" class="button-delete-alternative">
+                <x-dropdown-link href="{{ route('alternative.destroy', ['project' => Route::input('project'), 'alternative' => $alternative->id]) }}" class="button-delete-alternative">
                     {{ __('Delete') }}
                 </x-dropdown-link>
             </li>
