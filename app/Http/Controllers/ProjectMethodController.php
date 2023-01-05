@@ -75,9 +75,6 @@ class ProjectMethodController extends Controller
         // $alternative_taxonomy_keys = DB::table('alternative_taxonomies')
         //     ->distinct('key_slug')
         //     ->get(['key', 'key_slug']);
-        DB::statement("SET SQL_MODE=''");
-        $sql = "SELECT DISTINCT JSON_KEYS(details) AS detail_keys FROM alternatives;";
-        $get_dk = DB::select($sql);
         $detail_keys = $this->get_detail_keys();
 
         return response()->json(compact("methods", "detail_keys"));
@@ -172,7 +169,7 @@ class ProjectMethodController extends Controller
 
         $methods = Method::all();
         // $alternative_taxonomy_keys = AlternativeTaxonomy::distinct("key_slug")->get(["key", "key_slug"]);
-        $detail_keys = $this->get_detail_keys();
+        $detail_keys = collect($this->get_detail_keys())->toArray();
 
         return view("pages.project_method.edit", compact("project_method", "methods", "detail_keys"));
     }

@@ -158,10 +158,11 @@ window.editProjectMethod = function (element) {
                 }
             })
             const old_detail_keys = JSON.parse(element.getAttribute("data-detail_keys"))
+
             old_detail_keys.forEach(({ name, slug }, index) => {
                 let has_criteria = this.body.criterias.filter(criteria => criteria.slug == slug).length
                 has_criteria = has_criteria > 0 ? true : false
-                if (!has_criteria) {
+                if (!has_criteria && slug && name) {
                     this.body.criterias.push({
                         name,
                         slug,
