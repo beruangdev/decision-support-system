@@ -1,16 +1,1 @@
-@php
-    $attribute_strings = [];
-    if (!isset($attributes)) {
-        $attributes = collect([]);
-    }
-    $attributes = $attributes->merge(["class" => "font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"]);
-    $default_class = explode(' ', 'font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer');
-    foreach ($attributes as $key => $attribute) {
-        if ($key == 'class') {
-            $attribute = join(' ', array_merge($default_class, explode(' ', $attribute)));
-        }
-        array_push($attribute_strings, "$key='$attribute'");
-    }
-    $attribute_strings = join(' ', $attribute_strings);
-@endphp
-<a {!! $attribute_strings !!}>{{ $label }}</a>
+<a {{ $attributes->merge(['class' => 'block rounded-md px-4 py-2 text-left text-sm leading-5 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer']) }}>{{ $slot }}</a>

@@ -16,3 +16,12 @@ window.on = function (selector, event, handler) {
     );
 }
 
+window.log = function() {
+    let datas = []
+    for (let index = 0; index < arguments.length; index++) {
+        let argument = arguments[index];
+        if (typeof argument == "object") argument = JSON.parse(JSON.stringify(argument))
+        datas.push(argument)
+    }
+    console.log(...datas);
+}

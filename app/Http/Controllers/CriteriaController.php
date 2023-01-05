@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Criteria;
 use App\Http\Requests\StoreCriteriaRequest;
 use App\Http\Requests\UpdateCriteriaRequest;
+use Illuminate\Http\Request;
 
 class CriteriaController extends Controller
 {
@@ -26,6 +27,28 @@ class CriteriaController extends Controller
     public function create()
     {
         //
+    }
+
+    public function update_weight(Request $requests, $project_id, $project_method_id)
+    {
+        // return response()->json($requests);
+        $criterias = collect();
+        foreach (collect($requests)->toArray() as $key => $request) {
+
+            $criteria = Criteria::where("project_method_id", $project_method_id)->where("slug", $request["slug"])->first();
+            if (!$criteria) {
+                $criteria = new Criteria();
+                $criteria->name = $request["name"];
+                $criteria->slug = $request["slug"];
+                $criteria->project_method_id = $project_method_id;
+            }
+            $criteria->checked = $request["checked"];
+            $criteria->type = $request["type"];
+            $criteria->weight = $request["weight"];
+            $criteria->save();
+            $criterias->push($criteria);
+        }
+        return response()->json(compact("criterias"));
     }
 
     /**

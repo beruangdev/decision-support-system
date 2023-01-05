@@ -1,0 +1,11 @@
+// bordered
+table.bordered {
+    // @apply border;
+    th {
+        @apply border border-r-0;
+    }
+    th:last-child {
+        @apply border-r;
+    }
+}
+// END bordered

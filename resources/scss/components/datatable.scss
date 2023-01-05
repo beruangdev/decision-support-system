@@ -15,6 +15,9 @@ main .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
 // .dataTables_wrapper thead tr {
 //     @apply bg-gray-200 text-sm dark:bg-gray-900;
 // }
+.dataTables_wrapper .dataTables_filter {
+    @apply mb-3;
+}
 
 /*Form fields*/
 .dataTables_wrapper select,

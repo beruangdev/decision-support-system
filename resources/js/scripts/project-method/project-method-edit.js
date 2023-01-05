@@ -2,7 +2,7 @@ window.alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "
 window.editProjectMethod = function (element) {
     return {
         element,
-        alternative_taxonomy_keys: [],
+        detail_keys: [],
         old_value: [],
         body: {
             name: "",
@@ -86,7 +86,53 @@ window.editProjectMethod = function (element) {
         ],
         // input_selector: `.container-input-project-method input, .container-input-project-method textarea, .container-input-project-method select`,
         input_selector: `.container-input-project-method input[type="text"], .container-input-project-method textarea, .container-input-project-method select, .container-input-project-method input[type="checkbox"]`,
+        resetCriteriaRasio() {
+            let check_criteria = ['jumlah-anggota-keluarga', 'luas-lantai', 'rata-rata-listrik', 'rata-rata-pemasukan', 'rata-rata-pengeluaran']
 
+            this.body.criterias.forEach(c => {
+                if (check_criteria.includes(c.slug)) c.checked = true
+                else c.checked = false
+            })
+            let old_values = [
+                [1, 1, 1, 3, 9],
+                [1, 1, 1, 3, 7],
+                [1, 1, 1, 5, 7],
+                [0.3333333333333333, 0.3333333333333333, 0.2, 1, 3],
+                [0.1111111111111111, 0.14285714285714285, 0.14285714285714285, 0.3333333333333333, 1]
+            ]
+
+            if (this.body.criterias.filter(c => c.checked).length != check_criteria.length) {
+                alert("Gak bisa reset ada criteria yang kurang")
+                return false
+            }
+
+            // update criteria rasio checked
+            this.updateCriteriaRasioChecked()
+
+            // update criteria rasio value
+            let values = []
+            old_values.forEach((value, index1) => {
+                value.forEach((val, index2) => {
+                    if (index2 > index1) {
+                        // log(index1, index2, val)
+                        values.push(val)
+                    }
+                });
+            });
+            this.body.criteria_rasios.filter(r => r.checked).forEach((rasio, index) => {
+                let index_weight = this.weights.findIndex(w => w.value == values[index])
+                rasio.value = index_weight
+            })
+            // recalculate method
+            this.calculateMethod()
+        },
+        updateCriteriaRasioChecked() {
+            this.body.criteria_rasios.forEach((cr, index) => {
+                let is_checked = this.body.criterias.filter(c => cr.slugs.includes(c.slug))
+                is_checked = is_checked.every((c) => c.checked == true)
+                cr.checked = is_checked
+            });
+        },
         async init() {
             console.log("INITIALIZE: editProjectMethod()");
 
@@ -95,13 +141,9 @@ window.editProjectMethod = function (element) {
 
             // await new Promise((r) => setTimeout(r, 100))
             window.onload = () => {
-                console.log("old_value", this.get(this.old_value));
-                // console.log("alternative_taxonomy_keys", this.get(this.alternative_taxonomy_keys));
                 this.init_body_values()
-                console.log("body", this.get(this.body));
-                // console.log("inputs", this.get(this.inputs));
-                // console.log("criterias", this.get(this.criterias));
                 this.calculateMethod()
+                // element.querySelector(".reset-criteria-rasio").click()
             }
         },
         init_body_values() {
@@ -115,18 +157,20 @@ window.editProjectMethod = function (element) {
                     name, slug, type, checked: checked == 0 ? false : true
                 }
             })
-
-            JSON.parse(element.getAttribute("data-alternative_taxonomy_keys")).forEach((atk) => {
-                let criterias = this.old_value.criterias.filter(criteria => criteria.slug == atk.key_slug)
-                if (criterias.length == 0) {
+            const old_detail_keys = JSON.parse(element.getAttribute("data-detail_keys"))
+            old_detail_keys.forEach(({ name, slug }, index) => {
+                let has_criteria = this.body.criterias.filter(criteria => criteria.slug == slug).length
+                has_criteria = has_criteria > 0 ? true : false
+                if (!has_criteria) {
                     this.body.criterias.push({
-                        name: atk.key,
-                        slug: atk.key_slug,
+                        name,
+                        slug,
                         checked: false,
                         type: "cost"
                     })
                 }
             })
+
             this.body.criterias = this.body.criterias.sort((a, b) => a.slug.localeCompare(b.slug))
 
             let initial_index = 0
@@ -151,7 +195,6 @@ window.editProjectMethod = function (element) {
             // Init Criteria Rasios
             // this.body.criteria_rasios
             let criteria_rasio_json = JSON.parse(this.old_value.criteria_rasio_json)
-            // console.log(criteria_rasio_json);
             this.body.criterias.forEach((criteria1, index1) => {
                 this.body.criterias.forEach((criteria2, index2) => {
                     if (index1 < index2) {
@@ -174,7 +217,6 @@ window.editProjectMethod = function (element) {
             })
         },
         submit() {
-            console.log("submit");
             // this.pull_input_values()
             // if (!this.validate()) return false
             let body = this.get(this.body)
@@ -186,14 +228,10 @@ window.editProjectMethod = function (element) {
                     rasio: this.weights[cr.value].value
                 }
             })
-            console.log("body", body);
             // element.submit()
             this.ajax(body)
             // location.reload()
             // this.resetForm()
-
-            console.log("submit done");
-
         },
         get(obj) {
             return JSON.parse(JSON.stringify(obj))
@@ -257,7 +295,7 @@ window.editProjectMethod = function (element) {
                 }
             }).then(({ data, status }) => {
                 // This is the JSON from our response
-                console.log("response", data);
+                log("response", data);
             }).catch((err) => {
                 // There was an error
                 console.warn('Something went wrong.', err);
@@ -273,7 +311,6 @@ window.editProjectMethod = function (element) {
             element.querySelectorAll(`.container-criterias input[type="checkbox"][name="criterias"]`).forEach(input => input.checked = false)
         },
         onCriteriaUpdate(index, criteria1) {
-            console.log("CHANGE onCriteriaUpdate");
             let initial_index = 0
             // update criteria initial
             this.body.criterias = this.body.criterias.map((criteria) => {
@@ -297,7 +334,6 @@ window.editProjectMethod = function (element) {
                 }
             });
 
-            console.log("criterias", this.get(this.body.criterias));
             this.calculateMethod()
         },
         getRasioWeightLabel(index, criteria) {
@@ -324,8 +360,7 @@ window.editProjectMethod = function (element) {
             this.calculateMethod()
         },
         calculateMethod() {
-            console.log(`START calculateMethod`);
-            // make table
+            console.log("calculateMethod");
             let table_values = []
             let rasios = this.get(this.body.criteria_rasios.filter(r => r.checked))
             let criterias = this.get(this.body.criterias.filter(r => r.checked))
@@ -343,15 +378,16 @@ window.editProjectMethod = function (element) {
                         } else {
                             let rasio = rasios.filter(r => r.slugs[0] == criteria2.slug && r.slugs[1] == criteria1.slug)
                             let seek = Math.floor(this.weights.length / 2)
-                            if (parseInt(rasio[0].value) > 8) seek = Math.floor(this.weights.length / 2) + 1
-                            let value = this.getCircularArray(this.weights, parseInt(rasio[0].value + seek)).value
+                            if (parseInt(rasio[0].value) > Math.floor(this.weights.length / 2)) {
+                                seek = Math.floor(this.weights.length / 2) + 1
+                            }
+                            let value = this.getCircularArray(this.weights, parseInt(rasio[0].value) + seek).value
                             if (parseInt(rasio[0].value) == 0) value = 1
                             table_values[index1].push(value)
                         }
                     }
                 })
             })
-            // console.table_values(table_values);
 
             // draw criteria initial
             let criteria_initial_html = ""
@@ -440,7 +476,6 @@ window.editProjectMethod = function (element) {
                 data,
                 columns,
                 initComplete: function () {
-                    // console.log(`Datatable initComplete`);
                     this.api().tables().header().to$().addClass('bg-gray-200 text-sm dark:bg-gray-900')
 
                     this.api().columns(':first').nodes().flatten().to$().addClass('bg-gray-200 dark:bg-gray-900')
@@ -463,10 +498,12 @@ window.editProjectMethod = function (element) {
             }), { title: "Weight" }]
 
             data = ahp_result.normalisasi.values
+
             ahp_result.normalisasi.weight.forEach((weight, index) => {
                 data[index].unshift(criterias[index].initial)
                 data[index].push(weight)
             })
+            this.updateCriteriaWeight(ahp_result.normalisasi.weight)
             data = cleanFloatAndInt(data)
 
             $(selector).DataTable({
@@ -474,7 +511,6 @@ window.editProjectMethod = function (element) {
                 data,
                 columns,
                 initComplete: function () {
-                    // console.log(`Datatable initComplete`);
                     this.api().tables().header().to$().addClass('bg-gray-200 text-sm dark:bg-gray-900')
 
                     this.api().columns(':first, :last').nodes().flatten().to$().addClass('bg-gray-200 dark:bg-gray-900')
@@ -509,7 +545,6 @@ window.editProjectMethod = function (element) {
                 data,
                 columns,
                 initComplete: function () {
-                    // console.log(`Datatable initComplete`);
                     this.api().tables().header().to$().addClass('bg-gray-200 text-sm dark:bg-gray-900')
 
                     this.api().columns(':first, :last').nodes().flatten().to$().addClass('bg-gray-200 dark:bg-gray-900')
@@ -517,8 +552,6 @@ window.editProjectMethod = function (element) {
                     $(this.api().row(':last').node()).addClass("!bg-gray-200 dark:!bg-gray-900")
                 },
             });
-
-
 
             // table-check-consistency
             selector = "#table-check-consistency"
@@ -538,7 +571,6 @@ window.editProjectMethod = function (element) {
                 data,
                 columns,
                 initComplete: function () {
-                    // console.log(`Datatable initComplete`);
                     this.api().tables().header().to$().addClass('bg-gray-200 text-sm dark:bg-gray-900')
 
                     // this.api().columns(':first, :last').nodes().flatten().to$().addClass('bg-gray-200 dark:bg-gray-900')
@@ -550,5 +582,44 @@ window.editProjectMethod = function (element) {
 
             console.log("ahp_result", ahp_result);
         },
+        async updateCriteriaWeight(weights) {
+            let request = []
+            this.body.criterias.filter(c => c.checked).forEach((criteria, index) => {
+                request.push({
+                    name: criteria.name,
+                    slug: criteria.slug,
+                    type: criteria.type,
+                    checked: criteria.checked,
+                    weight: weights[index],
+                })
+            })
+            fetch(element.getAttribute("action-update_weight"), {
+                method: 'PUT',
+                body: JSON.stringify(request),
+                headers: {
+                    "Accept": "application/json, text-plain, */*",
+                    "X-Requested-With": "XMLHttpRequest",
+                    'Content-Type': 'application/json',
+                    'url': element.getAttribute("action-update_weight"),
+                    "X-CSRF-Token": csrf
+                },
+            }).then(async (response) => {
+                if (response.ok) {
+                    console.log("UPDATE WEIGHT");
+                    response = await response.json()
+                } else {
+                    console.log("UPDATE WEIGHT ERROR");
+                    response = await response.text()
+                }
+                console.log("response:", response);
+                return response
+            }).then(({ data, status }) => {
+                // This is the JSON from our response
+                // console.log("response", data);
+            }).catch((err) => {
+                // There was an error
+                console.warn('Something went wrong.', err);
+            });
+        }
     }
 }

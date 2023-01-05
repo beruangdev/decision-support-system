@@ -21,7 +21,7 @@ class AlternativeSeeder extends Seeder
     {
         $project_count = Project::count();
         $alternatives = [];
-        for ($i = 0; $i < intval(env("ALTERNATIVE_COUNT", 500)); $i++) {
+        for ($i = 0; $i < intval(env("ALTERNATIVE_COUNT", 0)); $i++) {
             $faker = Faker::create('id_ID');
             $alternative = new Alternative();
             $alternative->name = $faker->name();

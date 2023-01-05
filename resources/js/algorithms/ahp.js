@@ -1,4 +1,5 @@
-window.ahp = function ({ values }) {
+window.ahp = ahp
+function ahp({ values }) {
     return {
 
         ri: [
@@ -34,11 +35,8 @@ window.ahp = function ({ values }) {
         cr: 0,
 
         init() {
-            console.log("INIT AHP");
-            console.log("values", values)
             this.values_rotate = this.rotate_array(this.values)
             this.length = this.values[0].length
-            console.log("values_rotate", this.values_rotate)
 
             this.$eigen_vektor_normalisasi()
 
@@ -53,9 +51,7 @@ window.ahp = function ({ values }) {
             this.$cr()
         },
         $eigen_vektor_normalisasi() {
-            console.log(`RUN eigen_vektor_normalisasi`);
             this.eigen_vektor_normalisasi.results = this.sum_array(this.values_rotate)
-            console.log(`END eigen_vektor_normalisasi`);
         },
         $normalisasi_value() {
             let normalisasi_values = this.values_rotate.map((value_rotate, index1) => {
@@ -98,14 +94,12 @@ window.ahp = function ({ values }) {
             this.lambda = this.values_normal_weight.totals.reduce((accumulator, value) => {
                 return accumulator + value;
             }, 0);
-            console.log("this.lambda", this.lambda);
         },
         $ci() {
             this.ci = (this.lambda - this.length) / (this.length - 1)
         },
         $cr() {
             this.cr = this.ci / this.get_ri()
-            console.log("this.cr", this.cr);
         },
         get(data) {
             return JSON.parse(JSON.stringify(data))

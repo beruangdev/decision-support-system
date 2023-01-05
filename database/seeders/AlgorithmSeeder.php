@@ -16,7 +16,13 @@ class AlgorithmSeeder extends Seeder
      */
     public function run()
     {
-        $algorithms = ["Evaluation based on Distance from Average Solution (EDAS)"];
+        $algorithms = [
+            "Evaluation based on Distance from Average Solution (EDAS)",
+            "Visekriterijumsko. Kompromisno Rangiranje (VIKOR)",
+            "Weight Aggregated Sum Product Assesment (WASPA)",
+            "Simple Multi Attribute Rating Technique (SMART)",
+            
+        ];
         foreach ($algorithms as $key => $value) {
             $algorithm = new Algorithm();
             $algorithm->name = $value;

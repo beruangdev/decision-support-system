@@ -3,9 +3,9 @@ function editAltenative(element) {
     return {
         body: {},
         element,
-        taxonomy: null,
-        taxonomies: [],
-        target_dom: "input#alternative-edit-name, textarea#alternative-edit-description",
+        detail: null,
+        details: [],
+        target_dom: "input#alternative-edit-name, textarea#alternative-edit-description, textarea#alternative-edit-uuid",
         target_dom_validate: "input#alternative-edit-name",
         async submitEditAltenative(e) {
             e.preventDefault()
@@ -29,7 +29,7 @@ function editAltenative(element) {
             Object.keys(this.body).forEach(key => {
                 request[key] = this.body[key].value
             })
-            request["taxonomies"] = this.taxonomies.map(tax => {
+            request["details"] = this.details.map(tax => {
                 return {
                     key: tax.key,
                     value: tax.value,
@@ -37,7 +37,7 @@ function editAltenative(element) {
             })
             if (values.every(value => value != "")) {
                 element.querySelector(".close-alternative-edit-modal").click()
-                let res = await fetch(`${routes["alternative.index"].uri}/${this.taxonomy.id}`, {
+                let res = await fetch(`${routes["alternative.index"].uri}/${this.detail.id}`, {
                     method: 'PUT',
                     body: JSON.stringify(request),
                     headers: {
@@ -54,7 +54,7 @@ function editAltenative(element) {
                 Object.keys(this.body).forEach(key => {
                     this.body[key] = { ...this.body[key], value: "" }
                 })
-                this.taxonomies = []
+                this.details = []
                 // element.querySelector("#alternative-description").innerHtml = ""
 
                 if (window.table_alternative) {
@@ -77,27 +77,29 @@ function editAltenative(element) {
 
             on(".button-edit-alternative", "click", (e, _this) => {
                 let old_alternative = JSON.parse(_this.getAttribute("data-alternative"))
-                this.taxonomy = old_alternative
+                this.detail = old_alternative
                 this.body.name.value = old_alternative.name
+                this.body.uuid.value = old_alternative.uuid
                 this.body.description.value = old_alternative.description
-                this.taxonomies = old_alternative.alternative_taxonomies.map(at => {
-                    return { key: at.key, value: at.value }
+                old_alternative.details = JSON.parse(old_alternative.details)
+                this.details = Object.keys(old_alternative.details).map(key => {
+                    return { key: key, value: old_alternative.details[key] }
                 })
 
             })
         },
-        addTaxonomy() {
+        addDetail() {
             const key = element.querySelector("#alternative-edit-key").value
             const value = element.querySelector("#alternative-edit-value").value
             if (key && value) {
-                this.taxonomies.push({ key, value })
+                this.details.push({ key, value })
             }
         },
-        updateTaxonomy(index, field, value) {
-            this.taxonomies[index][field] = value
+        updateDetail(index, field, value) {
+            this.details[index][field] = value
         },
-        deleteTaxonomy(index) {
-            this.taxonomies.splice(index, 1)
+        deleteDetail(index) {
+            this.details.splice(index, 1)
         }
 
     }

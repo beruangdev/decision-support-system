@@ -9,6 +9,7 @@ module.exports = {
         // './app/Http/Controllers/*.blade.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.js',
+        './public/webworker/**.js',
     ],
 
     theme: {

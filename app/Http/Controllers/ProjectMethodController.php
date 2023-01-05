@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProjectMethod;
+use Yajra\Datatables\Datatables;
 use App\Http\Requests\StoreProjectMethodRequest;
 use App\Http\Requests\UpdateProjectMethodRequest;
-use App\Models\AlternativeTaxonomie;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+use App\Models\ProjectMethod;
 use App\Models\Criteria;
 use App\Models\CriteriaRasio;
 use App\Models\Method;
@@ -17,9 +21,58 @@ class ProjectMethodController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($project_id)
     {
-        //
+        return view("pages.project_method.index", compact("project_id"));
+    }
+
+    public function list($project_id)
+    {
+        // $project = Project::where("id", $project_id)->with(["project_methods"])->firstOrfail();
+        $project_methods = ProjectMethod::where("project_id", $project_id)->with(["method"])->latest()->get();
+
+        return Datatables::of($project_methods)
+            ->addIndexColumn()
+            ->addColumn('method', function ($project_method) {
+                return $project_method->method->name;
+            })
+            ->addColumn('name', function ($project_method) use ($project_id) {
+                $label = $project_method->name;
+                $attributes = collect([
+                    "href" => route("project_method.edit", [
+                        "project" => $project_id,
+                        "method" => $project_method->id
+                    ])
+                ]);
+                return view("components.linkC", compact("label", "attributes"));
+            })
+            ->addColumn('action', function ($project_method) use ($project_id) {
+                return view("pages.project.components.show-table-button-action", compact("project_method", "project_id"));
+            })
+            ->rawColumns(['action', "method", "name"])
+            ->make(true);
+    }
+
+    public function get_default(Request $request)
+    {
+        $methods = DB::table('methods')->get();
+        // $alternative_taxonomy_keys = DB::table('alternative_taxonomies')
+        //     ->distinct('key_slug')
+        //     ->get(['key', 'key_slug']);
+        DB::statement("SET SQL_MODE=''");
+        $sql = "SELECT DISTINCT JSON_KEYS(details) AS detail_keys FROM alternatives;";
+        $get_dk = DB::select($sql);
+        $detail_keys = [];
+        if (count($get_dk) > 0) {
+            foreach (json_decode(DB::select($sql)[0]->detail_keys) as $key) {
+                $detail_keys[] = [
+                    "key" => $key,
+                    "key_slug" => Str::slug($key),
+                ];
+            }
+        }
+
+        return response()->json(compact("methods", "detail_keys"));
     }
 
     /**
@@ -104,15 +157,24 @@ class ProjectMethodController extends Controller
      */
     public function edit($project_id, $project_method_id)
     {
-        $project_method = ProjectMethod::where("id", $project_method_id)->with(["criterias", "criterias.criteria_rasio_1", "criterias.criteria_rasio_2"]);
+        $project_method = ProjectMethod::where("id", $project_method_id)->with(["criterias", "project"]);
         $project_method = $project_method->firstOrFail();
 
         // return response()->json($project_method);
 
         $methods = Method::all();
-        $alternative_taxonomy_keys = AlternativeTaxonomie::distinct("key_slug")->get(["key", "key_slug"]);
+        // $alternative_taxonomy_keys = AlternativeTaxonomy::distinct("key_slug")->get(["key", "key_slug"]);
+        DB::statement("SET SQL_MODE=''");
+        $sql = "SELECT DISTINCT JSON_KEYS(details) AS detail_keys FROM alternatives;";
+        $detail_keys = [];
+        foreach (json_decode(DB::select($sql)[0]->detail_keys) as $key) {
+            $detail_keys[] = [
+                "name" => $key,
+                "slug" => Str::slug($key),
+            ];
+        }
 
-        return view("pages.project_method.edit", compact("project_method", "methods", "alternative_taxonomy_keys"));
+        return view("pages.project_method.edit", compact("project_method", "methods", "detail_keys"));
     }
 
     /**
@@ -182,7 +244,7 @@ class ProjectMethodController extends Controller
      * @param  \App\Models\ProjectMethod  $project_method
      * @return \Illuminate\Http\Response
      */
-    public function destroy($project_id ,$project_method_id)
+    public function destroy($project_id, $project_method_id)
     {
         return response()->json(ProjectMethod::where("id", $project_method_id)->delete());
     }

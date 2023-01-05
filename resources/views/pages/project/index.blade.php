@@ -96,7 +96,9 @@
                 processing: true,
                 serverSide: true,
                 deferRender: true,
-                ajax: "{{ route('project.list') }}",
+                ajax: {
+                    url: "{{ route('project.list') }}",
+                },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',

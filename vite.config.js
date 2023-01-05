@@ -8,7 +8,12 @@ export default defineConfig({
                 'resources/scss/app.scss',
                 'resources/js/app.js',
             ],
-            refresh: true,
+            refresh: ["public/webworker/**/*.js", "app/Http/Controllers/*.php"],
+            // refresh: [
+            //     {
+            //         paths: 
+            //     }
+            // ],
             publicDirectory: 'public'
         }),
     ],

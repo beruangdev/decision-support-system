@@ -14,16 +14,18 @@ return new class extends Migration
     public function up()
     {
         Schema::create('alternatives', function (Blueprint $table) {
+            // $table->uuid("id")->unique()->primary();
             $table->id();
-
+            $table->string("uuid", 225);
             $table->string('name');
             $table->text('description')->nullable();
-            $table->text('taxonomie_strings')->nullable();
+            $table->json('details')->default('{}');
 
             $table->foreignId('user_id')->references('id')->on('users');
             $table->foreignId('project_id')->references('id')->on('projects');
             $table->timestamps();
         });
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

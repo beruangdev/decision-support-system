@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AlternativeTaxonomie>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AlternativeTaxonomy>
  */
-class AlternativeTaxonomieFactory extends Factory
+class AlternativeTaxonomyFactory extends Factory
 {
     /**
      * Define the model's default state.

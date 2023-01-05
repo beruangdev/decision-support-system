@@ -18,12 +18,11 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
 
-
             $table->foreignId('user_id')->references('id')->on('users');
-
             
             $table->timestamps();
         });
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

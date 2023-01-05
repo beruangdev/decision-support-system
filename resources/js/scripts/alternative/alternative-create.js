@@ -3,10 +3,10 @@ window.createAltenative = function (element) {
         body: {},
         input_selector: ".alternative-input input, .alternative-input textarea",
         element,
-        taxonomies: [
-            // { key: "Provinsi", value: "Aceh" },
-            // { key: "Kabupaten", value: "Aceh Barat" },
-            // { key: "Salary", value: "1000000" },
+        details: [
+            { key: "Provinsi", value: "Aceh" },
+            { key: "Kabupaten", value: "Aceh Barat" },
+            { key: "Salary", value: "1000000" },
         ],
         init() {
             element.querySelectorAll(this.input_selector).forEach(input => {
@@ -21,12 +21,13 @@ window.createAltenative = function (element) {
         async submit() {
             if (!this.validate()) return false
             const request = this.make_request_data()
+            console.log("request", request);
             this.ajax(request)
         },
         make_request_data() {
             let request = {
                 alternatives: [],
-                taxonomies: [],
+                details: [],
             }
             let alternative = {}
             Object.keys(this.body).forEach(key => {
@@ -35,19 +36,19 @@ window.createAltenative = function (element) {
             })
             request.alternatives.push(alternative)
 
-            let taxonomy = this.taxonomies.map(tax => {
+            let detail = this.details.map(tax => {
                 return {
                     key: tax.key,
                     value: tax.value,
                 }
             })
-            request.taxonomies.push(taxonomy)
-            this.taxonomies = []
+            request.details.push(detail)
+            this.details = []
             return request
         },
         async ajax(request) {
             element.querySelector(".modal-close").click()
-            let response = await fetch(this.url(), {
+            fetch(this.url(), {
                 method: 'POST',
                 body: JSON.stringify(request),
                 headers: {
@@ -57,13 +58,33 @@ window.createAltenative = function (element) {
                     'url': this.url(),
                     "X-CSRF-Token": csrf
                 },
-            })
-            if (window.table_alternative) {
-                window.table_alternative.ajax.reload(null, false)
-            }
+            }).then(async (response) => {
+                if (window.table_alternative) {
+                    window.table_alternative.ajax.reload(null, false)
+                }
+                if (response.ok) {
+                    return {
+                        data: await response.json(),
+                        status: true,
+                    };
+                } else {
+                    return {
+                        data: await response.text(),
+                        status: false,
+                    };
+                }
+            }).then(({ data, status }) => {
+                // This is the JSON from our response
+                console.log("status", status);
+                console.log("response", data);
+            }).catch((err) => {
+                // There was an error
+                console.warn('Something went wrong.', err);
+            });
+
         },
         url() {
-            return routes["alternative.store"].uri
+            return element.getAttribute("action")
         },
         validate() {
             let result = true
@@ -80,19 +101,18 @@ window.createAltenative = function (element) {
             })
             return result
         },
-
-        addTaxonomy() {
+        addDetail() {
             const key = element.querySelector("#alternative-key").value
             const value = element.querySelector("#alternative-value").value
             if (key && value) {
-                this.taxonomies.push({ key, value })
+                this.details.push({ key, value })
             }
         },
-        updateTaxonomy(index, field, value) {
-            this.taxonomies[index][field] = value
+        updateDetail(index, field, value) {
+            this.details[index][field] = value
         },
-        deleteTaxonomy(index) {
-            this.taxonomies.splice(index, 1)
+        deleteDetail(index) {
+            this.details.splice(index, 1)
         }
 
     }

@@ -45,7 +45,6 @@
         var csrf = "{{ csrf_token() }}"
         var routes = @json($route_names)
     </script>
-
     <!-- Scripts -->
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
@@ -77,6 +76,10 @@
     <script src="https://unpkg.com/flowbite@1.5.5/dist/flowbite.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/jszip.js"></script> --}}
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> --}}
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.core.min.js"></script> --}}
 </body>
 
 </html>

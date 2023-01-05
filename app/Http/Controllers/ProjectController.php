@@ -6,7 +6,6 @@ use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Alternative;
-use App\Models\AlternativeTaxonomie;
 use App\Models\Method;
 use App\Models\ProjectMethod;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +34,7 @@ class ProjectController extends Controller
                 $attributes = collect([
                     "href" => route("project.show", $project->id)
                 ]);
-                return view("components.link", compact("label", "attributes"));
+                return view("components.linkC", compact("label", "attributes"));
             })
             ->addColumn('action', function ($project) {
                 return view("pages.project.components.table-button-action", compact("project"));
@@ -92,10 +91,20 @@ class ProjectController extends Controller
             ->addColumn('method', function ($project_method) {
                 return $project_method->method->name;
             })
+            ->addColumn('name', function ($project_method) use ($project_id) {
+                $label = $project_method->name;
+                $attributes = collect([
+                    "href" => route("project_method.edit", [
+                        "project" => $project_id,
+                        "method" => $project_method->id
+                    ])
+                ]);
+                return view("components.linkC", compact("label", "attributes"));
+            })
             ->addColumn('action', function ($project_method) use ($project_id) {
                 return view("pages.project.components.show-table-button-action", compact("project_method", "project_id"));
             })
-            ->rawColumns(['action', "method"])
+            ->rawColumns(['action', "method", "name"])
             ->make(true);
     }
 

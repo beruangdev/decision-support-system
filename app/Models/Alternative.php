@@ -10,7 +10,7 @@ class Alternative extends Model
     use HasFactory;
 
     protected $guarded = [];
-    
+
     protected static function boot()
     {
         parent::boot();
@@ -25,10 +25,4 @@ class Alternative extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
-    public function alternative_taxonomies()
-    {
-        return $this->hasMany(AlternativeTaxonomie::class, "alternative_id", "id");
-    }
-
 }

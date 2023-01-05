@@ -1,7 +1,8 @@
 window.createProjectMethod = function (element) {
     return {
         element,
-        alternative_taxonomy_keys: [],
+        detail_keys: [],
+        methods: [],
         body: {},
         inputs: {},
         criterias: [],
@@ -13,12 +14,21 @@ window.createProjectMethod = function (element) {
         input_selector: `.container-input-project-method input[type="text"], .container-input-project-method textarea, .container-input-project-method select, .container-input-project-method input[type="checkbox"]`,
 
         async init() {
-            console.log("INITIALIZE: createProjectMethod()");
-            this.alternative_taxonomy_keys = JSON.parse(element.getAttribute("data-alternative_taxonomy_keys"))
+            // console.log("INITIALIZE: createProjectMethod()");
+            // this.detail_keys = JSON.parse(element.getAttribute("data-detail_keys"))
 
-            this.alternative_taxonomy_keys = this.alternative_taxonomy_keys.sort((a, b) => a.key_slug.localeCompare(b.key_slug));
+            let init_response = await fetch(element.getAttribute("data-url_get_default"))
+            init_response = await init_response.json()
 
-            console.log("alternative_taxonomy_keys", this.get(this.alternative_taxonomy_keys));
+            this.detail_keys = init_response.detail_keys
+            console.log("this.init_response", init_response);
+            this.methods = init_response.methods
+
+
+            this.detail_keys = this.detail_keys.sort((a, b) => a.key_slug.localeCompare(b.key_slug));
+            
+
+            // console.log("detail_keys", this.get(this.detail_keys));
             // await new Promise((r) => setTimeout(r, 10))
             window.onload = () => {
                 this.pull_input_values()
@@ -112,14 +122,21 @@ window.createProjectMethod = function (element) {
         },
         validate() {
             let is_validate = true
+            function isElement(element) {
+                return element instanceof Element || element instanceof HTMLDocument;  
+            }
             Object.keys(this.inputs).forEach(key => {
-                let length = this.inputs[key].value.length
-                if (key == "criterias") length = this.inputs[key].value.filter(v => v.checked).length
+                let element = this.inputs[key].element
+                console.log("this.inputs[key]", element);
+                if (isElement(element) && element.getAttribute("data-required") != undefined) {
+                    let length = this.inputs[key].value.length
+                    if (key == "criterias") length = this.inputs[key].value.filter(v => v.checked).length
 
-                if (length < this.inputs[key].min_length) {
-                    is_validate = false
-                    this.inputs[key].error = true
-                    this.inputs[key].message = `The ${key} is required`
+                    if (length < this.inputs[key].min_length) {
+                        is_validate = false
+                        this.inputs[key].error = true
+                        this.inputs[key].message = `The ${key} is required`
+                    }
                 }
             })
 
@@ -189,7 +206,7 @@ window.createProjectMethod = function (element) {
 
             element.querySelectorAll(`.container-criterias input[type="checkbox"][name="criterias"]`).forEach(input => input.checked = false)
         },
-        updateAlternativeTaxonomyKeys(atk, index) {
+        updateAlternativedetailKeys(atk, index) {
             console.log("CHANGEEE");
 
             this.criterias = []
