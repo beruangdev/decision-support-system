@@ -53,13 +53,8 @@ class ProjectMethodController extends Controller
             ->make(true);
     }
 
-    public function get_default(Request $request)
+    public function get_detail_keys()
     {
-        $methods = DB::table('methods')->get();
-        // $alternative_taxonomy_keys = DB::table('alternative_taxonomies')
-        //     ->distinct('key_slug')
-        //     ->get(['key', 'key_slug']);
-        DB::statement("SET SQL_MODE=''");
         $sql = "SELECT DISTINCT JSON_KEYS(details) AS detail_keys FROM alternatives;";
         $get_dk = DB::select($sql);
         $detail_keys = [];
@@ -71,6 +66,19 @@ class ProjectMethodController extends Controller
                 ];
             }
         }
+        return $detail_keys;
+    }
+
+    public function get_default(Request $request)
+    {
+        $methods = DB::table('methods')->get();
+        // $alternative_taxonomy_keys = DB::table('alternative_taxonomies')
+        //     ->distinct('key_slug')
+        //     ->get(['key', 'key_slug']);
+        DB::statement("SET SQL_MODE=''");
+        $sql = "SELECT DISTINCT JSON_KEYS(details) AS detail_keys FROM alternatives;";
+        $get_dk = DB::select($sql);
+        $detail_keys = $this->get_detail_keys();
 
         return response()->json(compact("methods", "detail_keys"));
     }
@@ -164,15 +172,7 @@ class ProjectMethodController extends Controller
 
         $methods = Method::all();
         // $alternative_taxonomy_keys = AlternativeTaxonomy::distinct("key_slug")->get(["key", "key_slug"]);
-        DB::statement("SET SQL_MODE=''");
-        $sql = "SELECT DISTINCT JSON_KEYS(details) AS detail_keys FROM alternatives;";
-        $detail_keys = [];
-        foreach (json_decode(DB::select($sql)[0]->detail_keys) as $key) {
-            $detail_keys[] = [
-                "name" => $key,
-                "slug" => Str::slug($key),
-            ];
-        }
+        $detail_keys = $this->get_detail_keys();
 
         return view("pages.project_method.edit", compact("project_method", "methods", "detail_keys"));
     }

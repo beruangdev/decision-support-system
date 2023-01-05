@@ -81,10 +81,6 @@ class CalculateController extends Controller
         $alternatives = $alternatives->select(DB::raw("$sql"));
         $alternatives = $alternatives->whereRaw("project_id = $project_id");
 
-        // foreach (json_decode(DB::select($sql)[0]->detail_keys) as $key) {
-        //     $alternatives = $alternatives->whereRaw("JSON_EXTRACT(details, '$.$key') IS NOT NULL");
-        // }
-
         if (count($where_details) > 0) {
             foreach ($where_details as $key => $where) {
                 if (count($where) >= 2) {
