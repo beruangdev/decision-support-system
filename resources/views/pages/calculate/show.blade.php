@@ -32,7 +32,7 @@
                                 <button class="inline-block px-2 py-1 md:p-4 rounded-t-lg border-b-2" id="decision_matrix-tab" data-tabs-target="#decision_matrix" type="button" role="tab" aria-controls="decision_matrix"
                                     aria-selected="false">Matrix</button>
                             </li>
-                            <li role="presentation">
+                            <li role="presentation" class="hidden">
                                 <button class="inline-block px-2 py-1 md:p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="average_solution-tab"
                                     data-tabs-target="#average_solution" type="button" role="tab" aria-controls="average_solution" aria-selected="false">AV</button>
                             </li>
@@ -187,7 +187,7 @@
                             <div class="mb-2">
                                 <label for="score_rating-select-{{ $random }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select score</label>
                                 <select id="score_rating-select-{{ $random }}" name="score-rating"
-                                    class="w-24 py-1.5 px-2.5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    class="w-[69.6px] md:w-24 py-1.5 px-2.5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                     @foreach ($scores as $index => $score)
                                         <option value="{{ $index }}" {{ $score == 0.5 ? 'selected' : '' }}>{{ $score }}</option>
                                     @endforeach

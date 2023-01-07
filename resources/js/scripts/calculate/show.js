@@ -162,16 +162,16 @@ function showCalculate(element) {
             const options = {
                 // paging: false,
                 info: false,
-                lengthMenu: [10, 25, 50, 75, 100],
-                dom: `Blfrtip`,
-                buttons: {
-                    dom: {
-                        container: {
-                            className: 'dt-export-buttons'
-                        }
-                    },
-                    buttons: ['excel', 'pdf', 'print']
-                }
+                // lengthMenu: [10, 25, 50, 75, 100],
+                // dom: `Blfrtip`,
+                // buttons: {
+                //     dom: {
+                //         container: {
+                //             className: 'dt-export-buttons'
+                //         }
+                //     },
+                //     buttons: ['excel', 'pdf', 'print']
+                // }
             }
             let table = this.dom_table(selector, data, options)
 
