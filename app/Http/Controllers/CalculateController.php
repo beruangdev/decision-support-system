@@ -114,11 +114,12 @@ class CalculateController extends Controller
             }
         }
 
-        // $alternatives = $alternatives->paginate($request->get("paginate"));
         $per_page = intval($request->get("paginate"));
+        // $per_page = 60;
         $page = intval($request->get("page"));
         $skip = ($page - 1) * $per_page;
-        $alternative = $alternatives->skip($skip)->take($per_page);
+
+        $alternatives = $alternatives->skip($skip)->take($per_page);
         $alternatives = $alternatives->get(["id", "uuid", "name", "details"]);
 
         foreach ($alternatives as $alternative) {
@@ -139,6 +140,7 @@ class CalculateController extends Controller
 
         if ($request->event == "metadata") {
             $alternative_count = DB::table("alternatives")->count();
+            // $alternative_count = 60;
             return response()->json(compact("alternative_count", "calculate", "criterias"));
         }
 

@@ -2,6 +2,7 @@ import './bootstrap';
 
 window.ASEET_PATH = "/public"
 if (window.location.hostname == "localhost") window.ASEET_PATH = ""
+window.ASEET_PATH = ""
 
 import "./scripts"
 import "./vendor"

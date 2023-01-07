@@ -39,7 +39,6 @@ function createAlternativeFromFile(element) {
         worker: new Worker(`${ASEET_PATH}/webworker/scripts/alternative/alternative-create-from-file.js`),
         init() {
             this.queues = []
-            console.log("init createAlternativeFromFile");
             this.worker.postMessage({
                 event: "init", data: {
                     csrf,

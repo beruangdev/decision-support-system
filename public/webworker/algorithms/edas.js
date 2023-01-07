@@ -5,7 +5,8 @@ class Edas {
         this.url = url
         this.csrf = csrf
 
-        this.paginate = 400
+        // this.paginate = 15
+        this.paginate = 10000
         this.alternative_progress = {
             queues: [],
             percent: 0,
@@ -14,12 +15,14 @@ class Edas {
         this.alternatives = []
         this.alternative_array = [] // diurutkan berdasarkan ID user
         this.alternative_array_rotate = [] // diurutkan berdasarkan Criteria user
+        this.chunk_decision_matrix = []
 
         this.calculate = {}
         this.project_method = {}
         this.criterias = []
 
         this.averages = []
+        this.score_rating = []
         this.pda = [] // Horizontal
         this.nda = [] // Horizontal
         this.sp = [] // Horizontal
@@ -29,7 +32,7 @@ class Edas {
         this.nspi = [] // Vertical
         this.nsni = [] // Vertical
         this.as = [] // Horizontal
-        this.score_rating = [] // Horizontal
+        this.data = [] // Horizontal
     }
 
     async get_alternative_data() {
@@ -48,7 +51,10 @@ class Edas {
             },
         })
         records = await records.json()
-
+        this.self.postMessage({
+            event: "metadata",
+            data: records
+        })
         this.calculate = records.calculate
         this.project_method = this.calculate.project_method
         this.criterias = records.criterias.filter(c => c.checked == 1)
@@ -64,6 +70,7 @@ class Edas {
             this.alternatives.push(null)
             this.fetch_alternative({ page, request })
             if (page == (parseInt(records.alternative_count / this.paginate) + 1)) break
+            // if (page == parseInt(records.alternative_count / this.paginate)) break
         }
     }
     async fetch_alternative({ page, request }) {
@@ -100,7 +107,6 @@ class Edas {
     }
     alternatives_finish_fetch_all() {
         console.timeEnd("Get all ALTERNATIVES")
-        console.log("alternatives_finish_fetch_all");
         this.alternatives = this.alternatives.flat()
         this.Decision_matrix()
     }
@@ -122,15 +128,15 @@ class Edas {
             }
             dt_alternatives.push(newalt)
         }
-        this.self.postMessage({
-            event: "decision_matrix",
-            data: {
-                alternatives: this.display(dt_alternatives),
-                criterias: this.criterias,
-            }
-        })
-        console.timeEnd("Decision_matrix");
         this.alternative_array = this.rotate_array(this.alternative_array_rotate)
+        // this.self.postMessage({
+        //     event: "decision_matrix",
+        //     data: {
+        //         alternatives: this.display(this.chunk(dt_alternatives)[0] ?? []),
+        //         criterias: this.criterias,
+        //     }
+        // })
+        console.timeEnd("Decision_matrix");
         this.Average_solution()
     }
     Average_solution() {
@@ -151,11 +157,11 @@ class Edas {
             this.averages.push(avj)
         }
 
+        // this.self.postMessage({
+        //     event: "average_solution",
+        //     data: this.display(this.chunk(average_solution)[0] ?? [])
+        // })
         console.timeEnd("Average_solution");
-        this.self.postMessage({
-            event: "average_solution",
-            data: this.display(average_solution)
-        })
         this.Positive_negative_distance()
     }
     Positive_negative_distance() {
@@ -185,11 +191,11 @@ class Edas {
             let name = `[${this.alternatives[index1].uuid}] ${this.alternatives[index1].name}`
             pda_nda[index1].push(name, ...this.pda[index1], ...this.nda[index1])
         }
+        // this.self.postMessage({
+        //     event: "positive_negative_distance",
+        //     data: this.display(this.chunk(pda_nda)[0] ?? []),
+        // })
         console.timeEnd("Positive_negative_distance");
-        this.self.postMessage({
-            event: "positive_negative_distance",
-            data: this.display(pda_nda),
-        })
         this.Sum_weight()
     }
     Sum_weight() {
@@ -212,11 +218,11 @@ class Edas {
             let name = `[${this.alternatives[index1].uuid}] ${this.alternatives[index1].name}`
             sum_weight.push([name, ...this.sp[index1], spi, ...this.sn[index1], sni])
         }
+        // this.self.postMessage({
+        //     event: "sum_weight",
+        //     data: this.display(this.chunk(sum_weight)[0] ?? [])
+        // })
         console.timeEnd("sum_weight");
-        this.self.postMessage({
-            event: "sum_weight",
-            data: this.display(sum_weight)
-        })
         this.Normalization()
     }
     Normalization() {
@@ -234,11 +240,11 @@ class Edas {
             let name = `[${this.alternatives[index].uuid}] ${this.alternatives[index].name}`
             normalization.push([name, nspi, nsni])
         }
+        // this.self.postMessage({
+        //     event: "normalization",
+        //     data: this.display(this.chunk(normalization)[0] ?? [])
+        // })
         console.timeEnd("normalization");
-        this.self.postMessage({
-            event: "normalization",
-            data: this.display(normalization)
-        })
         this.Score_rating()
     }
     Score_rating() {
@@ -268,18 +274,58 @@ class Edas {
                 return my_sort(a, b, index1)
             })
             for (let index2 = 0; index2 < this.score_rating.length; index2++) {
-                this.score_rating[index2][index1 + 1] = index2 + 1                
+                this.score_rating[index2][index1 + 1] = index2 + 1
             }
         }
         this.score_rating.sort((a, b) => my_sort(a, b, 0))
 
-        console.timeEnd("score_rating");
         this.self.postMessage({
             event: "score_rating",
-            data: this.display(this.score_rating)
+            data: this.display(this.chunk(this.score_rating, 10)[0] ?? []),
+            recordsTotal: this.score_rating.length
         })
+
+        console.timeEnd("score_rating");
     }
 
+    get_data({ name, length, page, order, search }) {
+        console.time("GET DATA")
+        let datas = [...this[name]]
+
+        if (search && search != "") {
+            let searched = []
+            for (let index = 0; index < datas.length; index++) {
+                const row = datas[index];
+                if ([...row].join("-").toLocaleLowerCase().includes(search.toLocaleLowerCase())) {
+                    searched.push(row)
+                }
+            }
+            datas = searched
+        }
+
+        if (order[1] == "asc") {
+            datas.sort((b, a) => a[order[0]] == b[order[0]] ? 0 : (b[order[0]] < a[order[0]] ? -1 : 1))
+        } else {
+            datas.sort((a, b) => a[order[0]] == b[order[0]] ? 0 : (b[order[0]] < a[order[0]] ? -1 : 1))
+        }
+        const recordsDisplay = datas.length
+
+        // Loop sampai menemukan page yang ada isi
+        let chunk = []
+        for (page; chunk.length == 0; page--) {
+            chunk = this.chunk(datas, parseInt(length))[page - 1] ?? []
+            if (page == 1 || chunk.length > 0) break
+        }
+
+        this.self.postMessage({
+            name,
+            event: `update_data`,
+            data: this.display(chunk),
+            recordsDisplay,
+            page,
+        })
+        console.timeEnd("GET DATA")
+    }
 
     rotate_array(array) {
         let new_array = []
@@ -313,18 +359,29 @@ class Edas {
         }
         return new_arrays
     }
+    chunk(array, per_page) {
+        let result = [];
+        for (let i = 0; i < array.length; i += per_page) {
+            result.push(array.slice(i, i + per_page));
+        }
+        return result;
+    }
 }
 
 
 var edas
-self.onmessage = async (e) => {
+self.onmessage = async (evt) => {
     // let message = e.data;
-    const data = e.data.data
-    const event = e.data.event
-    console.log(event, data);
-    if (event == "start") {
-        edas = new Edas(self, data)
+    evt = evt.data
+    // const event = e.data.event
+    // console.log(evt);
+    if (evt.event == "start") {
+        edas = new Edas(self, evt.data)
         await edas.get_alternative_data()
     }
+    else if (evt.event == "get_data") {
+        edas.get_data(evt)
+    }
+
     // self.postMessage(data);
 };

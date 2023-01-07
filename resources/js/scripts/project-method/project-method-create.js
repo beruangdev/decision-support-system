@@ -21,7 +21,6 @@ window.createProjectMethod = function (element) {
             init_response = await init_response.json()
 
             this.detail_keys = init_response.detail_keys
-            console.log("this.init_response", init_response);
             this.methods = init_response.methods
 
 

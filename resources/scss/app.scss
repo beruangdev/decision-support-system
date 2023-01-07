@@ -7,6 +7,7 @@
 
 @import "components/table";
 @import "components/datatable";
+@import "components/datatable-costum";
 @import "components/flowbite";
 // @import "components/select2";
 
@@ -27,7 +28,9 @@
 input, textarea{
     @apply dark:border-gray-700;
 }
-
+[disabled], .disabled {
+    @apply cursor-not-allowed;
+}
 // main .bg-white {
 //     @apply dark:bg-gray-800;
 // }
