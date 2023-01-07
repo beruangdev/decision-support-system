@@ -12,7 +12,7 @@ window.layoutApp = () => {
         },
         onClickMode(){
             this.color_theme = this.color_theme == "dark" ? "light" : "dark"
-            localStorage.setItem('color-theme', color_theme)
+            localStorage.setItem('color-theme', this.color_theme)
         },
     }
 }
