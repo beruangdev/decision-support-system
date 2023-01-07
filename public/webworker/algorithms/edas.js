@@ -295,8 +295,9 @@ class Edas {
         if (search && search != "") {
             let searched = []
             for (let index = 0; index < datas.length; index++) {
-                const row = datas[index];
-                if ([...row].join("-").toLocaleLowerCase().includes(search.toLocaleLowerCase())) {
+                let row = datas[index];
+                if (Array.isArray(row)) row = row.join("").toLocaleLowerCase()
+                if (row.includes(search.toLocaleLowerCase())) {
                     searched.push(row)
                 }
             }
