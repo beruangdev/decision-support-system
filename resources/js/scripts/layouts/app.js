@@ -11,6 +11,9 @@ window.layoutApp = () => {
             }
         },
         onClickMode(){
+            document.documentElement.classList.remove('dark')
+            document.documentElement.classList.remove('light')
+            
             this.color_theme = this.color_theme == "dark" ? "light" : "dark"
             localStorage.setItem('color-theme', this.color_theme)
         },
