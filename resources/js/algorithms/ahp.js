@@ -87,7 +87,8 @@ function ahp({ values }) {
                     return vv * this.normalisasi.weight[index2]
                 })
             })
-
+            
+            
             this.values_normal_weight.totals = this.sum_array(this.values_normal_weight.values)
         },
         $lambda() {

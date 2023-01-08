@@ -36,7 +36,7 @@ function createAlternativeFromFile(element) {
 
 
         interval: null,
-        worker: new Worker(`${ASEET_PATH}/webworker/scripts/alternative/alternative-create-from-file.js`),
+        worker: new Worker(`${ASEET_PATH}/webworker/scripts/alternative/alternative-create-from-file.js?version=${version}`),
         init() {
             this.queues = []
             this.worker.postMessage({

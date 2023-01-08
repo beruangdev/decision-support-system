@@ -9,6 +9,7 @@ use App\Models\Alternative;
 use App\Models\AlternativeTaxonomy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class CalculateController extends Controller
@@ -152,6 +153,7 @@ class CalculateController extends Controller
 
     public function show(Request $request, $project_id, $project_method_id, $calculate_id)
     {
+        // dd(File::lastModified(public_path('build/manifest.json')));
         $calculate = Calculate::where("id", $calculate_id)->with(["algorithm", "project_method", "project_method.criterias"])->get()->first();
         $calculate->project_method->criterias = $this->static_criterias();
 

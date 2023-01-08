@@ -7,6 +7,7 @@ export default defineConfig({
             input: [
                 'resources/scss/app.scss',
                 'resources/js/app.js',
+                // 'resources/js/algorithms/ahp.js',
             ],
             refresh: ["public/webworker/**/*.js", "app/Http/Controllers/*.php"],
             // refresh: [

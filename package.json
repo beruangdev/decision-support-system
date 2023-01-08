@@ -1,7 +1,7 @@
 {
     "private": true,
     "scripts": {
-        "start": "vite",
+        "start": "vite --cors=true",
         "build": "vite build"
     },
     "devDependencies": {

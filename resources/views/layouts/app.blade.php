@@ -45,6 +45,25 @@
         var csrf = "{{ csrf_token() }}"
         var routes = @json($route_names)
     </script>
+
+    {{-- <script>
+        var manifest = @json(collect(json_decode(File::get(public_path('build/manifest.json'))))->toBase())
+
+        let newManifest = {}
+        Object.keys(manifest).forEach(key => {
+            newManifest[key] = {
+                file: manifest[key].file,
+                isEntry: manifest[key].isEntry,
+                src: manifest[key].src,
+                url: `public/build/${manifest[key].file}`
+            }
+        });
+        manifest = newManifest
+    </script> --}}
+
+    <script>
+        const version = {{ File::lastModified(public_path('build/manifest.json')) ?? 0 }};
+    </script>
     <!-- Scripts -->
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>

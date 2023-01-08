@@ -105,10 +105,11 @@ function showCalculate(element) {
                 this.init_edas()
             }
         },
-        init_edas() {
-            let worker_url = `${ASEET_PATH}/webworker/algorithms/edas.js`
+        async init_edas() {
             // TODO: Pisahkan worker untuk fetch data alternative
+            let worker_url = `${ASEET_PATH}/webworker/algorithms/edas.js?version=${version}`
             this.worker = new Worker(worker_url);
+
             this.worker.postMessage({
                 event: "start",
                 data: {
@@ -116,6 +117,7 @@ function showCalculate(element) {
                     csrf: csrf
                 }
             });
+
             this.worker.onmessage = (response) => {
                 const data = response.data
                 const event = response.data.event
