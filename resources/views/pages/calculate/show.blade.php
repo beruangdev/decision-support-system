@@ -18,7 +18,7 @@
                     </template>
                     @php
                         $alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-                        $alphabet = ['C2', 'C4', 'C5', 'C1', 'C3', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+                        // $alphabet = ['C2', 'C4', 'C5', 'C1', 'C3', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
                     @endphp
                     <ul class="criteria-initial list-disc list-inside text-xs md:text-sm mb-4">
                         @foreach ($criterias as $key => $criteria)
