@@ -1,3 +1,4 @@
+'use strict';
 class Edas {
     constructor(self, { url, csrf }) {
         this.self = self
@@ -16,6 +17,7 @@ class Edas {
         this.alternative_array = [] // diurutkan berdasarkan ID user
         this.alternative_array_rotate = [] // diurutkan berdasarkan Criteria user
         this.chunk_decision_matrix = []
+        this.decision_matrix = []
 
         this.calculate = {}
         this.project_method = {}
@@ -25,18 +27,21 @@ class Edas {
         this.score_rating = []
         this.pda = [] // Horizontal
         this.nda = [] // Horizontal
+        this.positive_negative_distance = [] // Horizontal
         this.sp = [] // Horizontal
         this.sn = [] // Horizontal
         this.spi = [] // Vertical
         this.sni = [] // Vertical
+        this.sum_weight = [] // Horizontal
         this.nspi = [] // Vertical
         this.nsni = [] // Vertical
+        this.normalization = []
         this.as = [] // Horizontal
         this.data = [] // Horizontal
     }
 
     async get_alternative_data() {
-        console.time("Get all ALTERNATIVES")
+        const start = performance.now()
         let records = await fetch(this.url, {
             method: "POST",
             body: JSON.stringify({
@@ -51,10 +56,10 @@ class Edas {
             },
         })
         records = await records.json()
-        this.self.postMessage({
-            event: "metadata",
-            data: records
-        })
+        // this.self.postMessage({
+        //     event: "metadata",
+        //     data: records
+        // })
         this.calculate = records.calculate
         this.project_method = this.calculate.project_method
         this.criterias = records.criterias.filter(c => c.checked == 1)
@@ -68,12 +73,12 @@ class Edas {
             }
             this.alternative_progress.queues.push(false)
             this.alternatives.push(null)
-            this.fetch_alternative({ page, request })
+            this.fetch_alternative({ start, page, request })
             if (page == (parseInt(records.alternative_count / this.paginate) + 1)) break
             // if (page == parseInt(records.alternative_count / this.paginate)) break
         }
     }
-    async fetch_alternative({ page, request }) {
+    async fetch_alternative({ start, page, request }) {
         const searchParams = new URLSearchParams({})
         searchParams.set("page", page)
         searchParams.set("paginate", this.paginate)
@@ -91,33 +96,33 @@ class Edas {
         })
         records = await records.json()
         this.alternatives[page - 1] = records.alternatives
-        this.alternatives_finish_item(page - 1)
+        this.alternatives_finish_item(start, page - 1)
     }
-    alternatives_finish_item(index) {
+    alternatives_finish_item(start, index) {
         this.alternative_progress.queues[index] = true
         let queues = this.alternative_progress.queues
         this.alternative_progress.percent = queues.filter(q => q == true).length / queues.length * 100
+        // console.log("this.alternative_progress.percent", this.alternative_progress.percent);
         this.self.postMessage({
             event: "decision_matrix_progress",
             data: this.alternative_progress.percent
         })
         if (queues.length > 0 && queues.every(data => data == true)) {
-            this.alternatives_finish_fetch_all()
+            this.alternatives_finish_fetch_all(start)
         }
     }
-    alternatives_finish_fetch_all() {
-        console.timeEnd("Get all ALTERNATIVES")
+    alternatives_finish_fetch_all(start) {
+        console.log("Get all ALTERNATIVES", `${performance.now() - start} ms`)
         this.alternatives = this.alternatives.flat()
         this.Decision_matrix()
     }
     Decision_matrix() {
-        console.time("Decision_matrix");
-        let dt_alternatives = []
+        const start = performance.now()
+        const fn_name = "decision_matrix"
         for (let index = 0; index < this.alternatives.length; index++) {
             const alt = this.alternatives[index];
-            let name = `[${alt.uuid}] ${alt.name}`
-            // let name = alt.name
-            let newalt = [index + 1, name]
+            let alt_name = `[${alt.uuid}] ${alt.name}`
+            let newalt = [index + 1, alt_name]
             for (let index_c = 0; index_c < this.criterias.length; index_c++) {
                 newalt.push(alt.details[this.criterias[index_c].name])
 
@@ -126,21 +131,23 @@ class Edas {
                 // Push data ke array rotate
                 this.alternative_array_rotate[index_c].push(alt.details[this.criterias[index_c].name])
             }
-            dt_alternatives.push(newalt)
+            this.decision_matrix.push(newalt)
         }
         this.alternative_array = this.rotate_array(this.alternative_array_rotate)
-        // this.self.postMessage({
-        //     event: "decision_matrix",
-        //     data: {
-        //         alternatives: this.display(this.chunk(dt_alternatives)[0] ?? []),
-        //         criterias: this.criterias,
-        //     }
-        // })
-        console.timeEnd("Decision_matrix");
+
+        this.self.postMessage({
+            name: fn_name,
+            event: `set_data`,
+            data: this.display(this.chunk(this[fn_name], 10)[0] ?? []),
+            recordsDisplay: this[fn_name].length,
+            page: 1,
+        })
+        console.log("Decision_matrix", `${performance.now() - start} ms`)
         this.Average_solution()
     }
     Average_solution() {
-        console.time("Average_solution");
+        const fn_name = "average_solution"
+        const start = performance.now()
         let average_solution = [
             ["AVJ"],
             ["Total"]
@@ -156,18 +163,12 @@ class Edas {
             average_solution[0].push(avj)
             this.averages.push(avj)
         }
-
-        // this.self.postMessage({
-        //     event: "average_solution",
-        //     data: this.display(this.chunk(average_solution)[0] ?? [])
-        // })
-        console.timeEnd("Average_solution");
+        console.log("Average_solution", `${performance.now() - start} ms`)
         this.Positive_negative_distance()
     }
     Positive_negative_distance() {
-        console.time("Positive_negative_distance");
-        let pda_nda = []
-
+        const fn_name = "positive_negative_distance"
+        const start = performance.now()
         function calculate(cal_type, _this, data, index) {
             let result
             if ((cal_type == "pda" && _this.criterias[index].type == "cost") || (cal_type == "nda" && _this.criterias[index].type == "benefit")) {
@@ -182,26 +183,30 @@ class Edas {
             const alternative = this.alternative_array[index1];
             this.pda.push([])
             this.nda.push([])
-            pda_nda.push([])
+            this.positive_negative_distance.push([])
             for (let index2 = 0; index2 < alternative.length; index2++) {
                 const data = alternative[index2];
                 this.pda[index1].push(calculate("pda", this, data, index2))
                 this.nda[index1].push(calculate("nda", this, data, index2))
             }
             let name = `[${this.alternatives[index1].uuid}] ${this.alternatives[index1].name}`
-            pda_nda[index1].push(name, ...this.pda[index1], ...this.nda[index1])
+            this.positive_negative_distance[index1].push(name, ...this.pda[index1], ...this.nda[index1])
         }
-        // this.self.postMessage({
-        //     event: "positive_negative_distance",
-        //     data: this.display(this.chunk(pda_nda)[0] ?? []),
-        // })
-        console.timeEnd("Positive_negative_distance");
+
+        this.self.postMessage({
+            name: fn_name,
+            event: `set_data`,
+            data: this.display(this.chunk(this[fn_name], 10)[0] ?? []),
+            recordsDisplay: this[fn_name].length,
+            page: 1,
+        })
+        console.log("Positive_negative_distance", `${performance.now() - start} ms`)
         this.Sum_weight()
     }
     Sum_weight() {
-        console.time("sum_weight");
-        let sum_weight = []
-
+        const fn_name = "sum_weight"
+        const start = performance.now()
+        console.log("this.criterias", this.criterias);
         for (let index1 = 0; index1 < this.pda.length; index1++) {
             this.sp.push([])
             this.sn.push([])
@@ -216,20 +221,24 @@ class Edas {
             this.spi.push(spi)
             this.sni.push(sni)
             let name = `[${this.alternatives[index1].uuid}] ${this.alternatives[index1].name}`
-            sum_weight.push([name, ...this.sp[index1], spi, ...this.sn[index1], sni])
+            this.sum_weight.push([name, ...this.sp[index1], spi, ...this.sn[index1], sni])
         }
-        // this.self.postMessage({
-        //     event: "sum_weight",
-        //     data: this.display(this.chunk(sum_weight)[0] ?? [])
-        // })
-        console.timeEnd("sum_weight");
+
+        this.self.postMessage({
+            name: fn_name,
+            event: `set_data`,
+            data: this.display(this.chunk(this[fn_name], 10)[0] ?? []),
+            recordsDisplay: this[fn_name].length,
+            page: 1,
+        })
+        console.log("Sum_weight", `${performance.now() - start} ms`)
         this.Normalization()
     }
     Normalization() {
-        console.time("normalization");
+        const fn_name = "normalization"
+        const start = performance.now()
         let spi_max = Math.max(...this.spi)
         let sni_max = Math.max(...this.sni)
-        let normalization = []
         for (let index = 0; index < this.spi.length; index++) {
             const spi_element = this.spi[index];
             const sni_element = this.sni[index];
@@ -238,17 +247,21 @@ class Edas {
             this.nspi.push(nspi)
             this.nsni.push(nsni)
             let name = `[${this.alternatives[index].uuid}] ${this.alternatives[index].name}`
-            normalization.push([name, nspi, nsni])
+            this.normalization.push([name, nspi, nsni])
         }
-        // this.self.postMessage({
-        //     event: "normalization",
-        //     data: this.display(this.chunk(normalization)[0] ?? [])
-        // })
-        console.timeEnd("normalization");
+        this.self.postMessage({
+            name: fn_name,
+            event: `set_data`,
+            data: this.display(this.chunk(this[fn_name], 10)[0] ?? []),
+            recordsDisplay: this[fn_name].length,
+            page: 1,
+        })
+        console.log("Normalization", `${performance.now() - start} ms`)
         this.Score_rating()
     }
     Score_rating() {
-        console.time("score_rating");
+        const fn_name = "score_rating"
+        const start = performance.now()
         let scores = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
         for (let index1 = 0; index1 < this.nspi.length; index1++) {
@@ -279,17 +292,26 @@ class Edas {
         }
         this.score_rating.sort((a, b) => my_sort(a, b, 0))
 
+        // this.self.postMessage({
+        //     event: "score_rating",
+        //     data: this.display(this.chunk(this.score_rating, 10)[0] ?? []),
+        //     recordsTotal: this.score_rating.length
+        // })
+
         this.self.postMessage({
-            event: "score_rating",
-            data: this.display(this.chunk(this.score_rating, 10)[0] ?? []),
-            recordsTotal: this.score_rating.length
+            name: fn_name,
+            event: `set_data`,
+            data: this.display(this.chunk(this[fn_name], 10)[0] ?? []),
+            recordsDisplay: this[fn_name].length,
+            page: 1,
         })
 
-        console.timeEnd("score_rating");
+        console.log("Score_rating", `${performance.now() - start} ms`)
     }
 
     get_data({ name, length, page, order, search }) {
-        console.time("GET DATA")
+        const start = performance.now()
+        console.log("GET DATA", name, length, page, order, search);
         let datas = [...this[name]]
 
         if (search && search != "") {
@@ -298,7 +320,7 @@ class Edas {
                 let row = datas[index];
                 if (Array.isArray(row)) row = row.join(" ").toLocaleLowerCase()
                 if (row.includes(search.toLocaleLowerCase())) {
-                    searched.push(row)
+                    searched.push(datas[index])
                 }
             }
             datas = searched
@@ -325,7 +347,7 @@ class Edas {
             recordsDisplay,
             page,
         })
-        console.timeEnd("GET DATA")
+        console.log(`GET DATA`, name, `${performance.now() - start} ms`);
     }
     rotate_array(array) {
         let new_array = []

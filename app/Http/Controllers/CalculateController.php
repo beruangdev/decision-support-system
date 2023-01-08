@@ -19,6 +19,9 @@ class CalculateController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    // For development
+    public $use_static_criterias = false;
+
     public function index()
     {
         //
@@ -136,8 +139,8 @@ class CalculateController extends Controller
         // $calculate = Calculate::where("id", $calculate_id)->with(["algorithm", "project_method", "project_method.criterias"])->get()->first();
 
         $calculate = Calculate::where("id", $calculate_id)->with(["algorithm", "project_method", "project_method.criterias"])->get()->first();
-        // $criterias = $calculate->project_method->criterias;
-        $criterias = $this->static_criterias();
+        $criterias = $calculate->project_method->criterias;
+        if($this->use_static_criterias) $criterias = $this->static_criterias();
 
         if ($request->event == "metadata") {
             $alternative_count = DB::table("alternatives")->count();
@@ -153,9 +156,10 @@ class CalculateController extends Controller
 
     public function show(Request $request, $project_id, $project_method_id, $calculate_id)
     {
-        // dd(File::lastModified(public_path('build/manifest.json')));
         $calculate = Calculate::where("id", $calculate_id)->with(["algorithm", "project_method", "project_method.criterias"])->get()->first();
-        $calculate->project_method->criterias = $this->static_criterias();
+        if($this->use_static_criterias){
+            $calculate->project_method->criterias = $this->static_criterias();
+        }
 
         return view("pages.calculate.show", compact("calculate", "project_id", "project_method_id", "calculate_id"));
     }

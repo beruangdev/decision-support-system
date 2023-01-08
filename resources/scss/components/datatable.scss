@@ -13,7 +13,7 @@
         @apply order-1;
         select {
             // py-[0.35rem] px-2.5 pr-8
-            @apply w-[69px] p-[4px] pl-2;
+            @apply w-[69px] md:w-24 p-[4px] pl-2;
             @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
         }
     }
@@ -32,7 +32,7 @@
         @apply mt-0 md:w-60 md:ml-auto flex-1 ml-2 md:flex-none;
 
         input {
-            @apply ml-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full py-[0.35rem] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
+            @apply ml-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full py-1 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
         }
     }
 

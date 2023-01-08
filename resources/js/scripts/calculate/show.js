@@ -79,10 +79,13 @@ function showCalculate(element) {
                 criterias: []
             }
         },
+
         decision_matrix_progress: 0,
-        criterias: [],
-        alternatives: [],
         alternative_count: 0,
+        total_page: 0,
+
+        criterias: [],
+
         datatable_default_config: {
             searching: false,
             ordering: false,
@@ -94,19 +97,21 @@ function showCalculate(element) {
             retrieve: true,
             processing: true,
         },
-        recordsDisplay: 0,
-        total_page: 0,
-        worker: null,
+        worker: undefined,
         async init() {
             this.calculate = JSON.parse(element.getAttribute("data-calculate"))
             this.calculate.project_method.criteria_rasio_json = JSON.parse(this.calculate.project_method.criteria_rasio_json)
 
             if (this.calculate.algorithm.slug == "evaluation-based-on-distance-from-average-solution-edas") {
-                this.init_edas()
+                this.start_edas()
             }
         },
-        async init_edas() {
-            // TODO: Pisahkan worker untuk fetch data alternative
+
+        async start_edas() {
+            if (this.worker) {
+                this.worker.close()
+                this.worker = undefined
+            }
             let worker_url = `${ASEET_PATH}/webworker/algorithms/edas.js?version=${version}`
             this.worker = new Worker(worker_url);
 
@@ -119,94 +124,20 @@ function showCalculate(element) {
             });
 
             this.worker.onmessage = (response) => {
-                const data = response.data
-                const event = response.data.event
-                if (event == "metadata") this.metadata(data);
-                else if (event == "decision_matrix") this.decision_matrix(data);
-                else if (event == "decision_matrix_progress") this.decision_matrix_progress = data;
-                else if (event == "average_solution") this.average_solution(data);
-                else if (event == "positive_negative_distance") this.positive_negative_distance(data);
-                else if (event == "sum_weight") this.sum_weight(data);
-                else if (event == "normalization") this.normalization(data);
-                else if (event == "score_rating") this.score_rating(data);
-                // else if (event == "update_score_rating") this.update_score_rating(data);
-                else if (event == "update_data") this.update_data(data);
+                const res_data = response.data
+                const event = res_data.event
+                if (event == "decision_matrix_progress") this.decision_matrix_progress = res_data.data;
+                else if (event == "set_data") this.set_data(res_data);
+                else if (event == "update_data") this.update_data(res_data);
             };
         },
-        metadata({ alternative_count, calculate, criterias }) {
-            this.alternative_count = alternative_count
-        },
-        decision_matrix({ alternatives, criterias }) {
-            this.criterias = criterias
-            this.alternatives = alternatives
-            let selector = "decision_matrix"
-            const options = {}
-            let table = this.dom_table(selector, alternatives, options)
-        },
-        average_solution(data) {
-            let selector = "average_solution"
-            this.dom_table(selector, data, this.datatable_default_config)
-        },
-        positive_negative_distance(data) {
-            let selector = "positive_negative_distance"
-            this.dom_table(selector, data)
-        },
-        sum_weight(data) {
-            let selector = "sum_weight"
-            this.dom_table(selector, data)
-        },
-        normalization(data) {
-            let selector = "normalization"
-            this.dom_table(selector, data)
-        },
-        score_rating({ data, recordsTotal }) {
-            let selector = "score_rating"
-            const options = {
-                // paging: false,
-                info: false,
-                // lengthMenu: [10, 25, 50, 75, 100],
-                // dom: `Blfrtip`,
-                // buttons: {
-                //     dom: {
-                //         container: {
-                //             className: 'dt-export-buttons'
-                //         }
-                //     },
-                //     buttons: ['excel', 'pdf', 'print']
-                // }
-            }
-            let table = this.dom_table(selector, data, options)
-
-            this.recordsDisplay = recordsTotal
-            this.draw_pagination(selector, table, 1)
-            this.listen_pagination(selector, table)
-
-            // Select which score rating want to show
-            let value = element.querySelector(`[name="score-rating"]`).value
-            value = ((parseInt(value) + 1) * 2)
-            table.column(value).visible(true);
-            table.column(value + 1).visible(true);
-
-            on(`[name="score-rating"]`, "change", (e, _this) => {
-                let value = ((parseInt(_this.value) + 1) * 2) + 1
-                for (let index = 2; index < (table.columns()[0].length - 1); index++) {
-                    if (value == index || value == index + 1) {
-                        table.column(index).visible(true);
-                        table.column(index + 1).visible(true);
-                    } else {
-                        table.column(index).visible(false);
-                        table.column(index + 1).visible(false);
-                    }
-                }
-            })
-
-        },
-        draw_pagination(name, table, page) {
-            let target_selector = `[table-target="#table-${name}"]`
+     
+        draw_pagination(name, table, page, recordsTotal) {
+            let target_selector = `[table-target="${name}"]`
             let html = ``
 
-            let total_page = Math.max(1, parseInt(this.recordsDisplay / table.page.info().length))
-            if ((this.recordsDisplay / table.page.info().length) > total_page) total_page++
+            let total_page = Math.max(1, parseInt(recordsTotal / table.page.info().length))
+            if ((recordsTotal / table.page.info().length) > total_page) total_page++
             this.total_page = total_page
 
             for (let index = 1; index <= total_page; index++) {
@@ -218,7 +149,7 @@ function showCalculate(element) {
             this.updateDisabled(name, page)
         },
         listen_pagination(name, table) {
-            let target_selector = `[table-target="#table-${name}"]`
+            let target_selector = `[table-target="${name}"]`
             let elps = `${target_selector} select.dtc-pagination`
             on(elps, "change", (e, _this) => {
                 let page = parseInt(_this.value)
@@ -257,10 +188,10 @@ function showCalculate(element) {
                 table.off("order.dt")
             })
 
-            this.listen({ name })
+            this.inisiate_listen_datatable({ name })
         },
         updateDisabled(name, page) {
-            let target_selector = `[table-target="#table-${name}"]`
+            let target_selector = `[table-target="${name}"]`
             const elpb_back = `${target_selector} [pagination-target="back"]`
             const elpb_next = `${target_selector} [pagination-target="next"]`
 
@@ -271,20 +202,48 @@ function showCalculate(element) {
             else if (page == this.total_page) $(elpb_next).addClass("disabled")
         },
 
+        set_data({ event, name, data, recordsDisplay, page }) {
+            // console.log(event, name, { recordsDisplay, page }, data);
+            let table = this.dom_table(name, data)
+            this.draw_pagination(name, table, 1, recordsDisplay)
+            this.listen_pagination(name, table)
+
+
+            if (name == "score_rating") {
+                // Select which score rating want to show
+                let value = element.querySelector(`[name="score-rating"]`).value
+                value = ((parseInt(value) + 1) * 2)
+                table.column(value).visible(true);
+                table.column(value + 1).visible(true);
+
+                on(`[name="score-rating"]`, "change", (e, _this) => {
+                    let value = ((parseInt(_this.value) + 1) * 2) + 1
+                    for (let index = 2; index < (table.columns()[0].length - 1); index++) {
+                        if (value == index || value == index + 1) {
+                            table.column(index).visible(true);
+                            table.column(index + 1).visible(true);
+                        } else {
+                            table.column(index).visible(false);
+                            table.column(index + 1).visible(false);
+                        }
+                    }
+                })
+            }
+        },
+
         update_data({ event, name, data, recordsDisplay, page }) {
-            this.recordsDisplay = recordsDisplay
+            // console.log(event, name, { recordsDisplay, page }, data);
             let table = $(`#table-${name}`).DataTable()
-            // table.clear().draw();
             table.clear();
             table.rows.add(data);
             table.columns.adjust().draw();
-            this.draw_pagination(name, table, page)
+            this.draw_pagination(name, table, page, recordsDisplay)
 
-            this.listen({ name })
+            this.inisiate_listen_datatable({ name })
         },
 
-        listen({ name }) {
-            let target_selector = `[table-target="#table-${name}"]`
+        inisiate_listen_datatable({ name }) {
+            let target_selector = `[table-target="${name}"]`
             let elps = `${target_selector} select.dtc-pagination`
             let table = $(`#table-${name}`).DataTable()
             table.off("search.dt")
@@ -335,6 +294,7 @@ function showCalculate(element) {
         dom_table(selector, data, options = {}) {
             selector = `#table-${selector}`
             return $(selector).DataTable({
+                info: false,
                 ...window.dt_options,
                 ...options,
                 data,

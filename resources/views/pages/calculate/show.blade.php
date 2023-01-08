@@ -18,7 +18,7 @@
                     </template>
                     @php
                         $alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-                        // $alphabet = ['C2', 'C4', 'C4', 'C1', 'C3', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+                        $alphabet = ['C2', 'C4', 'C5', 'C1', 'C3', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
                     @endphp
                     <ul class="criteria-initial list-disc list-inside text-xs md:text-sm mb-4">
                         @foreach ($criterias as $key => $criteria)
@@ -32,10 +32,10 @@
                                 <button class="inline-block px-2 py-1 md:p-4 rounded-t-lg border-b-2" id="decision_matrix-tab" data-tabs-target="#decision_matrix" type="button" role="tab" aria-controls="decision_matrix"
                                     aria-selected="false">Matrix</button>
                             </li>
-                            <li role="presentation" class="hidden">
+                            {{-- <li role="presentation" class="hidden">
                                 <button class="inline-block px-2 py-1 md:p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="average_solution-tab"
                                     data-tabs-target="#average_solution" type="button" role="tab" aria-controls="average_solution" aria-selected="false">AV</button>
-                            </li>
+                            </li> --}}
                             <li role="presentation">
                                 <button class="inline-block px-2 py-1 md:p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="positive_negative_distance-tab"
                                     data-tabs-target="#positive_negative_distance" type="button" role="tab" aria-controls="positive_negative_distance" aria-selected="false">PDA/NDA</button>
@@ -56,7 +56,7 @@
                     </div>
                     <div id="tab-edas" class="text-xs">
 
-                        <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800" id="decision_matrix" role="tabpanel" aria-labelledby="decision_matrix-tab">
+                        <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800 hide-dt-paginate" id="decision_matrix" role="tabpanel" aria-labelledby="decision_matrix-tab">
                             <div class="">
                                 <div class="w-full bg-gray-200 rounded-full h-1.5 mb-4 dark:bg-gray-700">
                                     <div class="bg-blue-600 h-1.5 rounded-full dark:bg-blue-500 transition-all  duration-500 " :style="`width: ${decision_matrix_progress}%`"></div>
@@ -85,11 +85,12 @@
 
                                     </tbody>
                                 </table>
+
+                                @include('pages.calculate.pagination', ["name" => "decision_matrix"])
                             </div>
                         </div>
 
-                        <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800" id="average_solution" role="tabpanel" aria-labelledby="average_solution-tab">
-
+                        {{-- <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800 hide-dt-paginate" id="average_solution" role="tabpanel" aria-labelledby="average_solution-tab">
                             <table id="table-average_solution" class="bordered display nowrap w-full text-sm text-left text-gray-500 dark:text-gray-400" width="100%">
                                 <thead class="text-xs text-gray-700 text-center bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
@@ -103,11 +104,10 @@
 
                                 </tbody>
                             </table>
+                        </div> --}}
 
-                        </div>
 
-
-                        <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800" id="positive_negative_distance" role="tabpanel" aria-labelledby="positive_negative_distance-tab">
+                        <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800 hide-dt-paginate" id="positive_negative_distance" role="tabpanel" aria-labelledby="positive_negative_distance-tab">
 
                             <table id="table-positive_negative_distance" class="bordered display nowrap w-full text-sm text-left text-gray-500 dark:text-gray-400" width="100%">
                                 <thead class="text-xs text-gray-700 text-center bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -131,9 +131,10 @@
                                 </tbody>
                             </table>
 
+                            @include('pages.calculate.pagination', ["name" => "positive_negative_distance"])
                         </div>
 
-                        <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800" id="sum_weight" role="tabpanel" aria-labelledby="sum_weight-tab">
+                        <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800 hide-dt-paginate" id="sum_weight" role="tabpanel" aria-labelledby="sum_weight-tab">
 
                             <table id="table-sum_weight" class="bordered display nowrap w-full text-sm text-left text-gray-500 dark:text-gray-400" width="100%">
                                 <thead class="text-xs text-gray-700 text-center bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -158,10 +159,11 @@
 
                                 </tbody>
                             </table>
+                            @include('pages.calculate.pagination', ["name" => "sum_weight"])
 
                         </div>
 
-                        <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800" id="normalization" role="tabpanel" aria-labelledby="normalization-tab">
+                        <div class="hidden bg-gray-50 rounded-lg dark:bg-gray-800 hide-dt-paginate" id="normalization" role="tabpanel" aria-labelledby="normalization-tab">
 
                             <table id="table-normalization" class="bordered display nowrap w-full text-sm text-left text-gray-500 dark:text-gray-400" width="100%" style="width: 100%">
                                 <thead class="text-xs text-gray-700 text-center bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -175,6 +177,7 @@
 
                                 </tbody>
                             </table>
+                            @include('pages.calculate.pagination', ["name" => "normalization"])
 
                         </div>
 
@@ -213,34 +216,7 @@
 
                                 </tbody>
                             </table>
-
-                            {{-- pagination --}}
-                            <div>
-                                <div class="dtc-pagination flex flex-wrap justify-between my-2" table-target="#table-score_rating">
-                                    {{-- info --}}
-                                    <div></div>
-
-                                    {{-- pagination --}}
-                                    <div class="wrapper-dtc-pagination">
-                                        <button type="button" pagination-target="back">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                                            </svg>
-                                        </button>
-
-                                        <select 
-                                            class="dtc-pagination">
-                                            <option value="1" selected>1</option>
-                                        </select>
-
-                                        <button type="button" pagination-target="next">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            @include('pages.calculate.pagination', ["name" => "score_rating"])
 
                         </div>
 
@@ -255,7 +231,7 @@
 
 <script>
     $(document).ready(function() {
-        const selector = `#score_rating-tab`
+        const selector = `#sum_weight-tab`
         var theInterval = setInterval(() => {
             if (document.querySelector(selector)) {
                 document.querySelector(selector).click()

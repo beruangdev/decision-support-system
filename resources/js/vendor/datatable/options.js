@@ -1,6 +1,5 @@
 window.dt_options = {
-    // dom: 'rtlp',
-    // scrollX: true,
+    // bDestroy: true,
     language: {
         decimal: "",
         emptyTable: "No data available in table",
