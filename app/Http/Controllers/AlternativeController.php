@@ -115,18 +115,20 @@ class AlternativeController extends Controller
 
         $uuids = [];
         foreach ($request->alternatives as $request_alternative) {
-            if ($request_alternative["uuid"]) $uuids[] = $request_alternative["uuid"];
+            $uuid = $request_alternative["uuid"] ?? null;
+            if ($uuid) $uuids[] = $uuid;
         }
         $old_alternatives = Alternative::where("project_id", $project_id)->whereIn("uuid", $uuids)->get(["id", "uuid"]);
 
         $alternatives = [];
         foreach ($request->alternatives as $request_alternative) {
             $id = null;
-            if ($request_alternative["uuid"]) {
-                $id = $old_alternatives->where("uuid", $request_alternative["uuid"])->first();
+            $uuid = $request_alternative["uuid"] ?? null;
+            if ($uuid) {
+                $id = $old_alternatives->where("uuid", $uuid)->first();
             }
             $alternative = [
-                "uuid" => $request_alternative["uuid"] ?? Str::uuid()->toString(),
+                "uuid" => $uuid ?? Str::uuid()->toString(),
                 "name" => $request_alternative["name"],
                 "project_id" => $project_id,
                 "user_id" => Auth::id(),
