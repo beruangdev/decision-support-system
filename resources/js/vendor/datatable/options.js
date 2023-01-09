@@ -1,5 +1,4 @@
 window.dt_options = {
-    // bDestroy: true,
     language: {
         decimal: "",
         emptyTable: "No data available in table",

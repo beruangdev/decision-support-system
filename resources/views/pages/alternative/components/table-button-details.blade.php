@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse (json_decode($alternative->details) as $key => $value)
+            @forelse (json_decode($alternative->attributes) as $key => $value)
                 <tr class="{{ $loop->last ? '' : 'border-b' }} dark:border-gray-700">
                     <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white border-r">
                         {{ $key }}
@@ -26,7 +26,7 @@
             @empty
                 <tr class="dark:border-gray-700">
                     <th scope="row" colspan="2" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                        Details is empty
+                        Attributes is empty
                     </th>
                 </tr>
             @endforelse

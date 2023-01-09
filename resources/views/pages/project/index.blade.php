@@ -2,13 +2,13 @@
     <div class="pb-12 pt-2 sm:pt-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <table class="setup-datatable stripe hover display" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
-                        <thead>
+                <div class="p-4 md:p-6">
+                    <table class="datatable hover bordered display nowrap w-full text-sm text-left text-gray-500 dark:text-gray-400" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
+                        <thead class="text-xs text-gray-700 text-center bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th></th>
                                 <th class="min-w-[10rem] md:min-w-[15rem]">Name</th>
-                                <th>Description</th>
+                                <th class="max-w-[50rem]">Description</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -90,9 +90,9 @@
 
 <script type="text/javascript">
     $(function() {
-        if (document.querySelector(".setup-datatable")) {
-            var table_project = $('.setup-datatable').DataTable({
-                responsive: true,
+        if (document.querySelector("table.datatable")) {
+            var table_project = $('table.datatable').DataTable({
+                ...dt_options,
                 processing: true,
                 serverSide: true,
                 deferRender: true,

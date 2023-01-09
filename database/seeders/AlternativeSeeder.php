@@ -29,7 +29,7 @@ class AlternativeSeeder extends Seeder
             $alternative->project_id = $faker->numberBetween(1, $project_count);
             $alternative->user_id = 1;
             $alternative->save();
-            array_push($alternatives, $alternative);
+            $alternatives[] = $alternative;
         }
 
 
@@ -56,29 +56,19 @@ class AlternativeSeeder extends Seeder
             ],
         ];
 
+        $new_alternatives = [];
         foreach ($alternatives as $index => $alternative) {
-            $alternative_taxonomies = [];
             $taxonomie_strings = [];
             foreach ($criterias as $key => $criteria) {
                 if ($faker->numberBetween(1, 10) >= 10) continue;
 
                 $value = $faker->numberBetween($criteria["numberBetween"][0], $criteria["numberBetween"][1]);
-                array_push($alternative_taxonomies, [
-                    "key" => $criteria["key"],
-                    "key_slug" => Str::slug($criteria["key"]),
-                    "value" => $value,
-                    "value_slug" => Str::slug($value),
-                    "order" => $key + 1,
-                    "alternative_id" => $alternative->id,
-                    "user_id" => 1,
-                ]);
-                array_push($taxonomie_strings, Str::slug($criteria["key"]) . "=" . Str::slug($value));
+                $taxonomie_strings[] = [$criteria["key"] => $value];
             }
-            if (count($alternative_taxonomies)) {
-                AlternativeTaxonomie::insert($alternative_taxonomies);
-                $alternative->taxonomie_strings = join(",", $taxonomie_strings);
-                $alternative->save();
-            }
+            $alternative->attributes = collect($taxonomie_strings)->toJson();
+            $new_alternatives[] = $alternative;
         }
+
+        Alternative::insert($new_alternatives);
     }
 }

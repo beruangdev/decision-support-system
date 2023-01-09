@@ -79,7 +79,7 @@
                             'project' => Route::input('project'),
                             'project_method' => $project_method->id,
                         ]) }}"
-                        data-detail_keys='@json($detail_keys)' x-data="editProjectMethod($el)" x-init="this.init" @submit.prevent="submit" data-old_value='@json($project_method)'>
+                        data-attribute_keys='@json($attribute_keys)' x-data="editProjectMethod($el)" x-init="this.init" @submit.prevent="submit" data-old_value='@json($project_method)'>
                         @csrf
                         @method('PUT')
 

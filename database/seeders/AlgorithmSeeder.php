@@ -19,9 +19,13 @@ class AlgorithmSeeder extends Seeder
         $algorithms = [
             "Evaluation based on Distance from Average Solution (EDAS)",
             "Visekriterijumsko. Kompromisno Rangiranje (VIKOR)",
+            "Analytic Hierarchy Process (AHP)",
+            "Technique for Order by Similarity to Ideal Solution (TOPSIS)",
+            "Multi-Attribute Utility Theory (MAUT)",
+            "Multi-Objective Optimization on the basis of Ratio Analysis (MOORA)",
+
             "Weight Aggregated Sum Product Assesment (WASPA)",
             "Simple Multi Attribute Rating Technique (SMART)",
-            
         ];
         foreach ($algorithms as $key => $value) {
             $algorithm = new Algorithm();

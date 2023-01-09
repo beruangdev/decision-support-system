@@ -36,29 +36,38 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
-    // Calculate
-    Route::post("project/{project}/method/{project_method}/calculate/{calculate_id}/alternative/list", [CalculateController::class, "alternative_list"])->name("calculate.alternative.list");
-    Route::resource("project/{project}/method/{project_method}/calculate", CalculateController::class)->names("calculate");
+    Route::prefix('project')->group(function () {
+        // Calculate
+        Route::post("{project}/method/{project_method}/calculate/{calculate_id}/alternative/list", [CalculateController::class, "alternative_list"])->name("calculate.alternative.list");
+        Route::resource("{project}/method/{project_method}/calculate", CalculateController::class)->names("calculate");
 
-    // Criteria
-    Route::put("project/{project}/method/{project_method}/update_weight", [CriteriaController::class, "update_weight"])->name("criteria.update_weight");
+        // Criteria
+        Route::put("{project}/method/{project_method}/update_weight", [CriteriaController::class, "update_weight"])->name("criteria.update_weight");
 
-    // Project Method
-    Route::get("project/{project}/method/list", [ProjectMethodController::class, "list"])->name("project_method.list");
-    Route::get("project/method/get_default", [ProjectMethodController::class, "get_default"])->name("project_method.get_default");
-    Route::post("project/{project}/method", [ProjectMethodController::class, "store"])->name("project_method.store");
-    Route::resource("project/{project}/method", ProjectMethodController::class)->names("project_method")->except([
-        'store'
-    ]);
+        // Project Method
+        Route::get("{project}/method/list", [ProjectMethodController::class, "list"])->name("project_method.list");
+        Route::get("method/get_default", [ProjectMethodController::class, "get_default"])->name("project_method.get_default");
+        Route::post("{project}/method", [ProjectMethodController::class, "store"])->name("project_method.store");
+        Route::resource("{project}/method", ProjectMethodController::class)->names("project_method")->except([
+            'store'
+        ]);
 
-    // Alternative
-    Route::get("project/{project}/alternative/list", [AlternativeController::class, "list"])->name("alternative.list");
-    Route::resource("project/{project}/alternative", AlternativeController::class);
 
+        // Alternative
+        Route::get("{project}/alternative/upload", [AlternativeController::class, "upload"])->name("alternative.upload");
+        Route::get("{project}/alternative/list", [AlternativeController::class, "list"])->name("alternative.list");
+        Route::resource("{project}/alternative", AlternativeController::class);
+    });
 
     // Project
-    Route::get("project/show/list/{project}", [ProjectController::class, "show_list"])->name("project.show.list");
-    Route::get("project/list", [ProjectController::class, "list"])->name("project.list");
+    Route::as('project.')->prefix("project")->group(function () {
+        Route::get("show/list/{project}", [ProjectController::class, "show_list"])->name("show.list");
+        Route::get("list", [ProjectController::class, "list"])->name("list");
+
+        // Project Attribute
+        Route::get("{project}/attribute", [ProjectController::class, "attribute"])->name("attribute");
+        Route::post("{project}/attribute", [ProjectController::class, "attribute_update"])->name("attribute");
+    });
     Route::resource("project", ProjectController::class);
 });
 

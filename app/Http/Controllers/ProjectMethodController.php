@@ -53,20 +53,20 @@ class ProjectMethodController extends Controller
             ->make(true);
     }
 
-    public function get_detail_keys()
+    public function get_attribute_keys()
     {
-        $sql = "SELECT DISTINCT JSON_KEYS(details) AS detail_keys FROM alternatives;";
+        $sql = "SELECT DISTINCT JSON_KEYS(attributes) AS attribute_keys FROM alternatives;";
         $get_dk = DB::select($sql);
-        $detail_keys = [];
+        $attribute_keys = [];
         if (count($get_dk) > 0) {
-            foreach (json_decode(DB::select($sql)[0]->detail_keys) as $key) {
-                $detail_keys[] = [
+            foreach (json_decode(DB::select($sql)[0]->attribute_keys) as $key) {
+                $attribute_keys[] = [
                     "key" => $key,
                     "key_slug" => Str::slug($key),
                 ];
             }
         }
-        return $detail_keys;
+        return $attribute_keys;
     }
 
     public function get_default(Request $request)
@@ -75,9 +75,9 @@ class ProjectMethodController extends Controller
         // $alternative_taxonomy_keys = DB::table('alternative_taxonomies')
         //     ->distinct('key_slug')
         //     ->get(['key', 'key_slug']);
-        $detail_keys = $this->get_detail_keys();
+        $attribute_keys = $this->get_attribute_keys();
 
-        return response()->json(compact("methods", "detail_keys"));
+        return response()->json(compact("methods", "attribute_keys"));
     }
 
     /**
@@ -169,9 +169,9 @@ class ProjectMethodController extends Controller
 
         $methods = Method::all();
         // $alternative_taxonomy_keys = AlternativeTaxonomy::distinct("key_slug")->get(["key", "key_slug"]);
-        $detail_keys = collect($this->get_detail_keys())->toArray();
+        $attribute_keys = collect($this->get_attribute_keys())->toArray();
 
-        return view("pages.project_method.edit", compact("project_method", "methods", "detail_keys"));
+        return view("pages.project_method.edit", compact("project_method", "methods", "attribute_keys"));
     }
 
     /**

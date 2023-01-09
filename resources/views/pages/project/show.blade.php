@@ -4,7 +4,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
-                    <table class="setup-datatable stripe hover display" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
+                    <table class="datatable hover bordered display nowrap w-full text-sm text-left text-gray-500 dark:text-gray-400" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
                         <thead>
                             <tr>
                                 <th></th>
@@ -33,9 +33,9 @@
 
 <script type="text/javascript">
     $(function() {
-        if (document.querySelector(".setup-datatable")) {
-            var table_project_show = $('.setup-datatable').DataTable({
-                responsive: true,
+        if (document.querySelector("table.datatable")) {
+            var table_project_show = $('table.datatable').DataTable({
+                ...dt_options,
                 processing: true,
                 serverSide: true,
                 deferRender: true,
@@ -69,4 +69,3 @@
         }
     });
 </script>
-

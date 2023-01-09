@@ -37,8 +37,16 @@
                             </x-dropdown-link>
 
                             <x-dropdown-link x-on:click.prevent="$dispatch('open-modal', 'modal-add-project')">
-                                {{ __('Add Project') }}
+                                {{ __('Add New') }}
                             </x-dropdown-link>
+
+                            @isset($project_id)
+                                <x-dropdown-link :href="route('project.attribute', [
+                                    'project' => $project_id,
+                                ])">
+                                    {{ __('Attribute') }}
+                                </x-dropdown-link>
+                            @endisset
 
                         </x-slot>
                     </x-dropdown>
@@ -108,9 +116,17 @@
             {{-- Right --}}
             <div class="flex flex-wrap items-center">
                 <button id="theme-toggle" type="button"
-                    class="text-gray-500 dark:text-gray-400 dark:bg-gray-840 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 aspect-square" @click="onClickMode">
+                    class="text-gray-500 dark:text-gray-400 dark:bg-gray-840 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 aspect-square"
+                    @click="onClickMode">
                     <div role="status" :class="'hidden'">
-                        <svg aria-hidden="true" class="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>
+                        <svg aria-hidden="true" class="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                fill="currentColor" />
+                            <path
+                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                fill="currentFill" />
+                        </svg>
                         <span class="sr-only">Loading...</span>
                     </div>
                     <svg id="theme-toggle-dark-icon" :class="color_theme == 'dark' ? $el.classList.remove('hidden') : 'hidden'" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -419,11 +435,11 @@
 
 
             <div class="mt-4">
-                <p class="mb-1">Add Alternative Details (if number just fill numerik value)</p>
+                <p class="mb-1">Add Alternative Attributes (if number just fill numerik value)</p>
                 <div class="grid grid-cols-12 gap-2">
                     <x-text-input id="alternative-key" name="key" type="text" placeholder="Key" class="col-span-5 dark:bg-transparent" />
                     <x-text-input id="alternative-value" name="value" type="text" placeholder="Value" class="col-span-5 md:col-span-6 dark:bg-transparent" />
-                    <x-secondary-button class="px-3 py-1 col-span-2 md:col-span-1 flex flex-wrap justify-center items-center bg-gray-600 hover:!bg-gray-700" type="button" @click.prevent="addDetail">
+                    <x-secondary-button class="px-3 py-1 col-span-2 md:col-span-1 flex flex-wrap justify-center items-center bg-gray-600 hover:!bg-gray-700" type="button" @click.prevent="addAttribute">
                         <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                         </svg>
@@ -432,7 +448,7 @@
             </div>
 
             <div class="mt-4 overflow-auto">
-                <p class="mb-1">Alternative Details</p>
+                <p class="mb-1">Alternative Attributes</p>
                 <table class="table-fixed w-full border-separate">
                     <thead>
                         <tr>
@@ -442,21 +458,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template x-for="(detail, index) in details" :key="index">
+                        <template x-for="(attribute, index) in attributes" :key="index">
                             <tr>
                                 <td class="p-0">
-                                    <input type="text" :value="detail.key" @keydown="updateDetail(index, 'key', $el.value)"
+                                    <input type="text" :value="attribute.key" @keydown="updateAttribute(index, 'key', $el.value)"
                                         class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm w-[-webkit-fill-available] dark:bg-transparent">
                                 </td>
                                 <td class="p-0">
-                                    <input type="text" :value="detail.value" @keydown="updateDetail(index, 'value', $el.value)"
+                                    <input type="text" :value="attribute.value" @keydown="updateAttribute(index, 'value', $el.value)"
                                         class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm w-[-webkit-fill-available] dark:bg-transparent">
                                 </td>
-                                {{-- <td x-text="detail.key"></td> --}}
-                                {{-- <td x-text="detail.value"></td> --}}
+                                {{-- <td x-text="attribute.key"></td> --}}
+                                {{-- <td x-text="attribute.value"></td> --}}
                                 <td class="p-0">
                                     <div class="flex flex-wrap justify-end items-center">
-                                        <x-danger-button @click.prevent="deleteDetail(index)" class="px-2 py-2">
+                                        <x-danger-button @click.prevent="deleteAttribute(index)" class="px-2 py-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
@@ -556,12 +572,12 @@
                                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choice criteria <span class="text-xs">*select at least 3 criteria</span></label>
                                         <div class="grid lg:grid-cols-2 gap-2">
 
-                                            <template x-for="(atk, index) in detail_keys" :key="index">
+                                            <template x-for="(atk, index) in attribute_keys" :key="index">
                                                 <div class="container-criteria-item flex items-center justify-between px-4 py-2 rounded border border-gray-200 dark:border-gray-700">
                                                     <div class="pr-2 flex">
                                                         <input x-bind:id="'checkbox-method-criteria-' + atk.key_slug" type="checkbox" :value="atk.key_slug" name="criterias"
                                                             class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mt-[0.1rem]"
-                                                            @change="updateAlternativedetailKeys(atk, index)" />
+                                                            @change="updateAlternativeattributeKeys(atk, index)" />
                                                         <label x-bind:for="'checkbox-method-criteria-' + atk.key_slug" class="ml-2 w-full text-sm font-medium text-gray-900 dark:text-gray-300" x-text="atk.key"></label>
                                                     </div>
 

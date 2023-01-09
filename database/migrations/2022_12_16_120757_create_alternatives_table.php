@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string("uuid", 225);
             $table->string('name');
             $table->text('description')->nullable();
-            $table->json('details')->default('{}');
+            $table->json('attributes')->default('{}');
 
             $table->foreignId('user_id')->references('id')->on('users');
             $table->foreignId('project_id')->references('id')->on('projects');

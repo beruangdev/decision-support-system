@@ -10,7 +10,7 @@
                                 <th></th>
                                 <th class="min-w-[10rem] md:min-w-[15rem]">Name</th>
                                 <th>Description</th>
-                                <th class="min-w-[15rem]">Details</th>
+                                <th class="min-w-[15rem]">Attributes</th>
                                 <th></th>
                                 <th></th>
                             </tr>
@@ -57,11 +57,11 @@
 
 
         <div class="mt-4">
-            <p class="mb-1">Add Alternative Details (if number just fill numerik value)</p>
+            <p class="mb-1">Add Alternative Attributes (if number just fill numerik value)</p>
             <div class="grid grid-cols-12 gap-2">
                 <x-text-input id="alternative-edit-key" name="key" type="text" placeholder="Key" class="col-span-5" />
                 <x-text-input id="alternative-edit-value" name="value" type="text" placeholder="Value" class="col-span-5 md:col-span-6" />
-                <x-secondary-button class="px-3 py-1 col-span-2 md:col-span-1 flex flex-wrap justify-center items-center bg-gray-600 hover:!bg-gray-700" type="button" @click.prevent="addDetail">
+                <x-secondary-button class="px-3 py-1 col-span-2 md:col-span-1 flex flex-wrap justify-center items-center bg-gray-600 hover:!bg-gray-700" type="button" @click.prevent="addAttribute">
                     <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                     </svg>
@@ -70,7 +70,7 @@
         </div>
 
         <div class="mt-4 overflow-auto">
-            <p class="mb-1">Alternative Details</p>
+            <p class="mb-1">Alternative Attributes</p>
             <table class="table-fixed w-full border-separate">
                 <thead>
                     <tr>
@@ -80,19 +80,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <template x-for="(detail, index) in details" :key="index">
+                    <template x-for="(attribute, index) in attributes" :key="index">
                         <tr>
                             <td class="p-0">
-                                <input type="text" :value="detail.key" @keydown="updateDetail(index, 'key', $el.value)" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm w-[-webkit-fill-available]">
+                                <input type="text" :value="attribute.key" @keydown="updateAttribute(index, 'key', $el.value)" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm w-[-webkit-fill-available]">
                             </td>
                             <td class="p-0">
-                                <input type="text" :value="detail.value" @keydown="updateDetail(index, 'value', $el.value)" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm w-[-webkit-fill-available]">
+                                <input type="text" :value="attribute.value" @keydown="updateAttribute(index, 'value', $el.value)" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm w-[-webkit-fill-available]">
                             </td>
-                            {{-- <td x-text="detail.key"></td> --}}
-                            {{-- <td x-text="detail.value"></td> --}}
+                            {{-- <td x-text="attribute.key"></td> --}}
+                            {{-- <td x-text="attribute.value"></td> --}}
                             <td class="p-0">
                                 <div class="flex flex-wrap justify-end items-center">
-                                    <x-danger-button @click.prevent="deleteDetail(index)" class="px-2 py-2">
+                                    <x-danger-button @click.prevent="deleteAttribute(index)" class="px-2 py-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
@@ -149,8 +149,8 @@
                     },
 
                     {
-                        data: 'details',
-                        name: 'details',
+                        data: 'attributes',
+                        name: 'attributes',
                         orderable: false,
                         searchable: false,
                     },
@@ -161,8 +161,8 @@
                         searchable: false
                     },
                     {
-                        data: 'details',
-                        name: 'details',
+                        data: 'attributes',
+                        name: 'attributes',
                         visible: false,
                     },
                 ],

@@ -42,7 +42,9 @@
     }
 
     table {
-        @apply inline-table w-full relative overflow-x-scroll;
+        // @apply inline-table;
+        @apply w-full relative overflow-x-scroll;
+        // display: -webkit-inline-box;
     }
 
     .dataTables_scroll {

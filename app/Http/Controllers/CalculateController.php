@@ -59,24 +59,24 @@ class CalculateController extends Controller
         ]);
     }
 
-    public function get_alternative($project_id, $where_details = [])
+    public function get_alternative($project_id, $where_attributes = [])
     {
         DB::statement("SET SQL_MODE=''");
-        $sql = "SELECT DISTINCT JSON_KEYS(details) AS detail_keys FROM alternatives;";
+        $sql = "SELECT DISTINCT JSON_KEYS(attributes) AS attribute_keys FROM alternatives;";
 
         $sql_select = [
             // "a.id",
             // "a.name",
             // "a.description",
-            // "a.details",
+            // "a.attributes",
             // "a.user_id",
             // "a.project_id",
             // "a.created_at",
             // "a.updated_at",
             "*",
         ];
-        foreach (json_decode(DB::select($sql)[0]->detail_keys) as $key) {
-            $sql_select[] = "JSON_UNQUOTE(JSON_VALUE(details, '$.$key')) AS `$key`";
+        foreach (json_decode(DB::select($sql)[0]->attribute_keys) as $key) {
+            $sql_select[] = "JSON_UNQUOTE(JSON_VALUE(attributes, '$.$key')) AS `$key`";
         }
         $sql_select = join(", ", $sql_select);
         $sql = "$sql_select";
@@ -85,8 +85,8 @@ class CalculateController extends Controller
         $alternatives = $alternatives->select(DB::raw("$sql"));
         $alternatives = $alternatives->whereRaw("project_id = $project_id");
 
-        if (count($where_details) > 0) {
-            foreach ($where_details as $key => $where) {
+        if (count($where_attributes) > 0) {
+            foreach ($where_attributes as $key => $where) {
                 if (count($where) >= 2) {
                     $key = $where[0];
                     $separator = "=";
@@ -95,7 +95,7 @@ class CalculateController extends Controller
                         $separator = $where[1];
                         $value = $where[2];
                     }
-                    $alternatives = $alternatives->whereRaw("JSON_EXTRACT(details, '$.$key') $separator $value");
+                    $alternatives = $alternatives->whereRaw("JSON_EXTRACT(attributes, '$.$key') $separator $value");
                 }
             }
         }
@@ -114,7 +114,7 @@ class CalculateController extends Controller
         $alternatives = Alternative::query();
         foreach ($calculate->project_method->criterias as $key => $criteria) {
             if ($criteria->checked == 1) {
-                $alternatives = $alternatives->where("details", "LIKE", "%\"$criteria->name\"%");
+                $alternatives = $alternatives->where("attributes", "LIKE", "%\"$criteria->name\"%");
             }
         }
 
@@ -124,10 +124,10 @@ class CalculateController extends Controller
         $skip = ($page - 1) * $per_page;
 
         $alternatives = $alternatives->skip($skip)->take($per_page);
-        $alternatives = $alternatives->get(["id", "uuid", "name", "details"]);
+        $alternatives = $alternatives->get(["id", "uuid", "name", "attributes"]);
 
         foreach ($alternatives as $alternative) {
-            $alternative["details"] =  collect(json_decode($alternative->details))->toBase();
+            $alternative["attributes"] =  collect(json_decode($alternative->attributes))->toBase();
         }
 
         return response()->json(compact("alternatives"));

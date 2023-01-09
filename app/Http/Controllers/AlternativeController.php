@@ -45,7 +45,7 @@ class AlternativeController extends Controller
         // $total_data = Alternative::where("user_id", Auth::id())->where("project_id", $project_id)->count();
         $total_data = DB::table("alternatives")->where("user_id", Auth::id())->where("project_id", $project_id)->count();
 
-        // $data = Alternative::where("user_id", Auth::id())->where("project_id", $project_id)->with(["alternative_details"])
+        // $data = Alternative::where("user_id", Auth::id())->where("project_id", $project_id)->with(["alternative_attributes"])
         //     ->skip($start)->take($rowperpage)
         //     ->get();
         $records = Alternative::query();
@@ -57,7 +57,7 @@ class AlternativeController extends Controller
         }
         
         $records = $records->where("user_id", Auth::id())->where("project_id", $project_id);
-        // $records = $records->with(["alternative_details"]);
+        // $records = $records->with(["alternative_attributes"]);
         if ($searchValue) {
             $records = $records->where('name', 'LIKE', '%' . $searchValue . '%');
         }
@@ -82,8 +82,8 @@ class AlternativeController extends Controller
                 ]);
                 return view("components.linkC", compact("label", "attributes"));
             })
-            ->addColumn('details', function ($alternative) {
-                return view("pages.alternative.components.table-button-details", compact("alternative"));
+            ->addColumn('attributes', function ($alternative) {
+                return view("pages.alternative.components.table-button-attributes", compact("alternative"));
             })
             ->addColumn('action', function ($alternative) {
                 return view("pages.alternative.components.table-button-action", compact("alternative"));
@@ -119,7 +119,7 @@ class AlternativeController extends Controller
                 "name" => $request_alternative["name"],
                 "project_id" => $project_id,
                 "user_id" => Auth::id(),
-                "details" => "{}",
+                "attributes" => "{}",
                 "created_at" => date('Y-m-d H:i:s'),
                 "updated_at" => date('Y-m-d H:i:s'),
             ];
@@ -128,12 +128,12 @@ class AlternativeController extends Controller
             $alternatives[] = $alternative;
         }
 
-        foreach ($request->details as $index => $request_details) {
-            $detail_strings = [];
-            foreach ($request_details as $key => $request_detail) {
-                $detail_strings[$request_detail["key"]] = $request_detail["value"];
+        foreach ($request->attributes as $index => $request_attributes) {
+            $attribute_strings = [];
+            foreach ($request_attributes as $key => $request_attribute) {
+                $attribute_strings[$request_attribute["key"]] = $request_attribute["value"];
             }
-            $alternatives[$index]["details"] = collect($detail_strings)->toJson();
+            $alternatives[$index]["attributes"] = collect($attribute_strings)->toJson();
         }
 
         foreach (array_chunk($alternatives, 1000) as $key => $item) {
@@ -174,33 +174,33 @@ class AlternativeController extends Controller
      */
     public function update(UpdateAlternativeRequest $request, $project_id, Alternative $alternative)
     {
-        $detail_strings = [];
-        foreach ($request->details as $key => $req_detail) {
-            $key = $req_detail['key'];
-            $value = $req_detail['value'];
-            $detail_strings[$key] = $value;
+        $attribute_strings = [];
+        foreach ($request->attributes as $key => $req_attribute) {
+            $key = $req_attribute['key'];
+            $value = $req_attribute['value'];
+            $attribute_strings[$key] = $value;
         }
 
         $alternative->name = $request->name;
         $alternative->uuid = $request->uuid;
         $alternative->description = $request->description;
-        $alternative->details = collect($detail_strings)->toJson();
+        $alternative->attributes = collect($attribute_strings)->toJson();
         $alternative->save();
 
-        // $details = [];
-        // Alternativedetail::where("alternative_id", $alternative->id)->delete();
-        // foreach ($request->details as $req_detail) {
-        //     $detail = new Alternativedetail();
-        //     $detail->key = $req_detail["key"];
-        //     $detail->key_slug = Str::slug($req_detail["key"]);
-        //     $detail->value = $req_detail["value"];
-        //     $detail->value_slug = Str::slug($req_detail["value"]);
-        //     $detail->alternative_id = $alternative->id;
-        //     $detail->user_id = Auth::id();
-        //     $detail->save();
-        //     array_push($details, $detail);
+        // $attributes = [];
+        // Alternativeattribute::where("alternative_id", $alternative->id)->delete();
+        // foreach ($request->attributes as $req_attribute) {
+        //     $attribute = new Alternativeattribute();
+        //     $attribute->key = $req_attribute["key"];
+        //     $attribute->key_slug = Str::slug($req_attribute["key"]);
+        //     $attribute->value = $req_attribute["value"];
+        //     $attribute->value_slug = Str::slug($req_attribute["value"]);
+        //     $attribute->alternative_id = $alternative->id;
+        //     $attribute->user_id = Auth::id();
+        //     $attribute->save();
+        //     array_push($attributes, $attribute);
         // }
-        // return response()->json(compact("alternative", "details"));
+        // return response()->json(compact("alternative", "attributes"));
 
         return response()->json(compact("alternative"));
     }
@@ -292,7 +292,7 @@ class AlternativeController extends Controller
         // $total_data = Alternative::where("user_id", Auth::id())->where("project_id", $project_id)->count();
         $total_data = DB::table("alternatives")->where("user_id", Auth::id())->where("project_id", $project_id)->count();
 
-        // $data = Alternative::where("user_id", Auth::id())->where("project_id", $project_id)->with(["alternative_details"])
+        // $data = Alternative::where("user_id", Auth::id())->where("project_id", $project_id)->with(["alternative_attributes"])
         //     ->skip($start)->take($rowperpage)
         //     ->get();
 
@@ -305,7 +305,7 @@ class AlternativeController extends Controller
         }
 
         $records = $records->where("user_id", Auth::id())->where("project_id", $project_id);
-        $records = $records->with(["alternative_details"]);
+        $records = $records->with(["alternative_attributes"]);
         if ($searchValue) {
             $records = $records->where('name', 'LIKE', '%' . $searchValue . '%');
         }
@@ -330,8 +330,8 @@ class AlternativeController extends Controller
                 ]);
                 return view("components.linkC", compact("label", "attributes"));
             })
-            ->addColumn('details', function ($alternative) {
-                return view("pages.alternative.components.table-button-details", compact("alternative"));
+            ->addColumn('attributes', function ($alternative) {
+                return view("pages.alternative.components.table-button-attributes", compact("alternative"));
             })
             ->addColumn('action', function ($alternative) {
                 return view("pages.alternative.components.table-button-action", compact("alternative"));
@@ -342,7 +342,7 @@ class AlternativeController extends Controller
 
     public function list1(Request $request, $project_id)
     {
-        $data = Alternative::where("user_id", Auth::id())->where("project_id", $project_id)->with(["alternative_details"])->latest()->get();
+        $data = Alternative::where("user_id", Auth::id())->where("project_id", $project_id)->with(["alternative_attributes"])->latest()->get();
         // return response()->json($data);
         return Datatables::of($data)
             ->addIndexColumn()
@@ -353,8 +353,8 @@ class AlternativeController extends Controller
                 ]);
                 return view("components.linkC", compact("label", "attributes"));
             })
-            ->addColumn('details', function ($alternative) {
-                return view("pages.alternative.components.table-button-details", compact("alternative"));
+            ->addColumn('attributes', function ($alternative) {
+                return view("pages.alternative.components.table-button-attributes", compact("alternative"));
             })
             ->addColumn('action', function ($alternative) {
                 return view("pages.alternative.components.table-button-action", compact("alternative"));

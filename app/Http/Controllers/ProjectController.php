@@ -10,6 +10,7 @@ use App\Models\Method;
 use App\Models\ProjectMethod;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
 
 class ProjectController extends Controller
@@ -36,10 +37,14 @@ class ProjectController extends Controller
                 ]);
                 return view("components.linkC", compact("label", "attributes"));
             })
+            ->addColumn('description', function ($project) {
+                return Str::limit($project->description, 40, '...');
+                // return "<div class='box'><p>{$project->description}</p></div>";
+            })
             ->addColumn('action', function ($project) {
                 return view("pages.project.components.table-button-action", compact("project"));
             })
-            ->rawColumns(['action', "name"])
+            ->rawColumns(['action', "name", "description"])
             ->make(true);
     }
 
