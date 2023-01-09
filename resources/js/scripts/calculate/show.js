@@ -75,7 +75,7 @@ function showCalculate(element) {
         calculate: {
             algorithm: {},
             project_method: {
-                criteria_rasio_json: "",
+                // criteria_rasio_json: "",
                 criterias: []
             }
         },
@@ -100,7 +100,7 @@ function showCalculate(element) {
         worker: undefined,
         async init() {
             this.calculate = JSON.parse(element.getAttribute("data-calculate"))
-            this.calculate.project_method.criteria_rasio_json = JSON.parse(this.calculate.project_method.criteria_rasio_json)
+            // this.calculate.project_method.criteria_rasio_json = JSON.parse(this.calculate.project_method.criteria_rasio_json)
 
             if (this.calculate.algorithm.slug == "evaluation-based-on-distance-from-average-solution-edas") {
                 this.start_edas()

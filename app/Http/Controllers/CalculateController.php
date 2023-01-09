@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Calculate;
 use App\Http\Requests\StoreCalculateRequest;
 use App\Http\Requests\UpdateCalculateRequest;
+use App\Models\Algorithm;
 use App\Models\Alternative;
 use App\Models\AlternativeTaxonomy;
 use Illuminate\Http\Request;
@@ -45,7 +46,12 @@ class CalculateController extends Controller
      */
     public function store(StoreCalculateRequest $request, $project_id, $project_method_id)
     {
+        $algorithm = Algorithm::find($request->algorithm);
+        $name = $request->name;
+        if (!$name) $name = "Calculate $algorithm->name";
         $calculate = new Calculate();
+        $calculate->name = $name;
+        $calculate->description =  $request->description;
         $calculate->project_method_id = $project_method_id;
         $calculate->algorithm_id = $request->algorithm;
         $calculate->save();
@@ -57,6 +63,19 @@ class CalculateController extends Controller
             "project_method" => $project_method_id,
             "calculate" => $calculate->id
         ]);
+    }
+
+    public function get_attribute_keys($project_id)
+    {
+        $sql = "SELECT DISTINCT JSON_KEYS(attributes) AS attribute_keys FROM alternatives where project_id = $project_id;";
+        $get_attr_key = DB::select($sql);
+        $attribute_keys = [];
+
+        if ($get_attr_key && $get_attr_key[0] && $get_attr_key[0]->attribute_keys) {
+            $get_attr_key = $get_attr_key[0]->attribute_keys;
+            return json_decode($get_attr_key);
+        }
+        return $attribute_keys;
     }
 
     public function get_alternative($project_id, $where_attributes = [])
@@ -75,7 +94,8 @@ class CalculateController extends Controller
             // "a.updated_at",
             "*",
         ];
-        foreach (json_decode(DB::select($sql)[0]->attribute_keys) as $key) {
+        $attribute_keys = $this->get_attribute_keys($project_id);
+        foreach ($attribute_keys as $key) {
             $sql_select[] = "JSON_UNQUOTE(JSON_VALUE(attributes, '$.$key')) AS `$key`";
         }
         $sql_select = join(", ", $sql_select);
@@ -140,7 +160,7 @@ class CalculateController extends Controller
 
         $calculate = Calculate::where("id", $calculate_id)->with(["algorithm", "project_method", "project_method.criterias"])->get()->first();
         $criterias = $calculate->project_method->criterias;
-        if($this->use_static_criterias) $criterias = $this->static_criterias();
+        if ($this->use_static_criterias) $criterias = $this->static_criterias();
 
         if ($request->event == "metadata") {
             $alternative_count = DB::table("alternatives")->count();
@@ -157,7 +177,7 @@ class CalculateController extends Controller
     public function show(Request $request, $project_id, $project_method_id, $calculate_id)
     {
         $calculate = Calculate::where("id", $calculate_id)->with(["algorithm", "project_method", "project_method.criterias"])->get()->first();
-        if($this->use_static_criterias){
+        if ($this->use_static_criterias) {
             $calculate->project_method->criterias = $this->static_criterias();
         }
 

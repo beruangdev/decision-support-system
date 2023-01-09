@@ -3,7 +3,7 @@ window.createAltenative = function (element) {
         body: {},
         input_selector: ".alternative-input input, .alternative-input textarea",
         element,
-        details: [
+        attributes: [
             { key: "Provinsi", value: "Aceh" },
             { key: "Kabupaten", value: "Aceh Barat" },
             { key: "Salary", value: "1000000" },
@@ -27,7 +27,7 @@ window.createAltenative = function (element) {
         make_request_data() {
             let request = {
                 alternatives: [],
-                details: [],
+                attributes: [],
             }
             let alternative = {}
             Object.keys(this.body).forEach(key => {
@@ -36,14 +36,14 @@ window.createAltenative = function (element) {
             })
             request.alternatives.push(alternative)
 
-            let detail = this.details.map(tax => {
+            let attribute = this.attributes.map(tax => {
                 return {
                     key: tax.key,
                     value: tax.value,
                 }
             })
-            request.details.push(detail)
-            this.details = []
+            request.attributes.push(attribute)
+            this.attributes = []
             return request
         },
         async ajax(request) {
@@ -105,14 +105,14 @@ window.createAltenative = function (element) {
             const key = element.querySelector("#alternative-key").value
             const value = element.querySelector("#alternative-value").value
             if (key && value) {
-                this.details.push({ key, value })
+                this.attributes.push({ key, value })
             }
         },
         updateDetail(index, field, value) {
-            this.details[index][field] = value
+            this.attributes[index][field] = value
         },
         deleteDetail(index) {
-            this.details.splice(index, 1)
+            this.attributes.splice(index, 1)
         }
 
     }

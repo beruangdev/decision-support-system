@@ -15,10 +15,9 @@ return new class extends Migration
     {
         Schema::create('project_methods', function (Blueprint $table) {
             $table->id();
-            $table->boolean("status")->default(false);
             $table->string("name");
             $table->text("description")->nullable();
-            $table->text("criteria_rasio_json")->nullable();
+            $table->json("rasios")->default("[]")->nullable();
 
             $table->foreignId('method_id')->references('id')->on('methods')->onDelete("cascade");
             $table->foreignId('project_id')->references('id')->on('projects')->onDelete("cascade");

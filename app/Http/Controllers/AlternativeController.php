@@ -55,14 +55,14 @@ class AlternativeController extends Controller
         } else {
             $records = $records->orderBy($columnName, $columnSortOrder);
         }
-        
+
         $records = $records->where("user_id", Auth::id())->where("project_id", $project_id);
         // $records = $records->with(["alternative_attributes"]);
         if ($searchValue) {
             $records = $records->where('name', 'LIKE', '%' . $searchValue . '%');
         }
         $records_count = $records->count();
-        
+
         // $records = $records->select('alternatives.*');
         $records = $records->skip($start)->take($rowperpage);
         $records = $records->get();
@@ -85,8 +85,8 @@ class AlternativeController extends Controller
             ->addColumn('attributes', function ($alternative) {
                 return view("pages.alternative.components.table-button-attributes", compact("alternative"));
             })
-            ->addColumn('action', function ($alternative) {
-                return view("pages.alternative.components.table-button-action", compact("alternative"));
+            ->addColumn('action', function ($alternative) use ($project_id) {
+                return view("pages.alternative.components.table-button-action", compact("alternative", "project_id"));
             })
             ->rawColumns(['action'])
             ->make(true);
@@ -112,8 +112,19 @@ class AlternativeController extends Controller
     public function store(StoreAlternativeRequest $request, $project_id)
     {
         // return response()->json($request->all());
+
+        $uuids = [];
+        foreach ($request->alternatives as $request_alternative) {
+            if ($request_alternative["uuid"]) $uuids[] = $request_alternative["uuid"];
+        }
+        $old_alternatives = Alternative::where("project_id", $project_id)->whereIn("uuid", $uuids)->get(["id", "uuid"]);
+
         $alternatives = [];
         foreach ($request->alternatives as $request_alternative) {
+            $id = null;
+            if ($request_alternative["uuid"]) {
+                $id = $old_alternatives->where("uuid", $request_alternative["uuid"])->first();
+            }
             $alternative = [
                 "uuid" => $request_alternative["uuid"] ?? Str::uuid()->toString(),
                 "name" => $request_alternative["name"],
@@ -125,10 +136,11 @@ class AlternativeController extends Controller
             ];
             $description = $request_alternative["description"] ?? null;
             if ($description != null) $alternative["description"] = $description;
+            if ($id != null) $alternative["id"] = $id->id;
             $alternatives[] = $alternative;
         }
 
-        foreach ($request->attributes as $index => $request_attributes) {
+        foreach ($request["attributes"] as $index => $request_attributes) {
             $attribute_strings = [];
             foreach ($request_attributes as $key => $request_attribute) {
                 $attribute_strings[$request_attribute["key"]] = $request_attribute["value"];
@@ -137,7 +149,7 @@ class AlternativeController extends Controller
         }
 
         foreach (array_chunk($alternatives, 1000) as $key => $item) {
-            Alternative::insert($item);
+            DB::table('alternatives')->upsert($alternatives, ["id", 'uuid', "project_id"], ['name', "attributes", "description"]);
         }
 
         return response()->json(compact("alternatives"));

@@ -23,7 +23,8 @@ class AlgorithmSeeder extends Seeder
             "Technique for Order by Similarity to Ideal Solution (TOPSIS)",
             "Multi-Attribute Utility Theory (MAUT)",
             "Multi-Objective Optimization on the basis of Ratio Analysis (MOORA)",
-
+            "Multi Attribute Decision Making (MADM)",
+            "Multiple Objective Decision Making (MODM)",
             "Weight Aggregated Sum Product Assesment (WASPA)",
             "Simple Multi Attribute Rating Technique (SMART)",
         ];

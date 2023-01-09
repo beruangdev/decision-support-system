@@ -32,8 +32,8 @@ class AlternativeCreate {
         return this.#queues;
     }
     update_queues() {
-        console.log("update_queues");
-        console.log(this.#queues);
+        // console.log("update_queues");
+        // console.log(this.#queues);
         this._self.postMessage({
             action: "update_queues",
             data: this.#queues
@@ -95,8 +95,6 @@ class AlternativeCreate {
             let workbook = XLSX.read(data, {
                 type: 'binary'
             });
-            console.log("file", file);
-            console.log("workbook", workbook);
             workbook.SheetNames.forEach(function (sheet_name) {
                 let queue = {
                     name: _this.slug(`${file.name} ${sheet_name}`),
@@ -192,15 +190,13 @@ class AlternativeCreate {
             // split perpage
             const body = this.make_body(sheet_data_chunk, alternative_keys)
             this.ajax(index_queue, index_chunk, body)
-
-            console.log("body", body);
         }
 
     }
     make_body(sheet_data_chunk, alternative_keys) {
         let body = {
             alternatives: [],
-            details: [],
+            attributes: [],
         }
 
         for (let index = 0; index < sheet_data_chunk.length; index++) {
@@ -215,17 +211,17 @@ class AlternativeCreate {
             }
             body.alternatives.push(alternative)
 
-            let detail = []
+            let attribute = []
             Object.keys(json_object).forEach(key => {
                 const slug = this.slug(key)
                 if (!["name", "description","id", "uuid", "no", "number", "nomor"].includes(slug)) {
-                    detail.push({
+                    attribute.push({
                         key: key,
                         value: json_object[key]
                     })
                 }
             })
-            body.details.push(detail)
+            body.attributes.push(attribute)
         }
         return body
     }
@@ -254,7 +250,7 @@ class AlternativeCreate {
             }
         }).then(({ data, status }) => {
             // This is the JSON from our response
-            console.log("status", status);
+            // console.log("status", status);
             console.log("response", data);
         }).catch((err) => {
             // There was an error

@@ -23,9 +23,6 @@ class MethodSeeder extends Seeder
             "Weighted Product (WP)",
             "Analytic Network Process (ANP)",
             "Technique for Order by Similarity to Ideal Solution (TOPSIS)",
-            
-            "Multi Attribute Decision Making (MADM)",
-
         ];
         foreach ($methods as $key => $value) {
             $method = new Method();

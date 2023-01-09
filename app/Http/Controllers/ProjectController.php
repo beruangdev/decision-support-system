@@ -31,20 +31,21 @@ class ProjectController extends Controller
         return Datatables::of($data)
             ->addIndexColumn()
             ->addColumn('name', function ($project) {
-                $label = $project->name;
-                $attributes = collect([
-                    "href" => route("project.show", $project->id)
-                ]);
-                return view("components.linkC", compact("label", "attributes"));
+                // $label = $project->name;
+                // $attributes = collect([
+                //     "href" => route("project.show", $project->id)
+                // ]);
+                // return view("components.linkC", compact("label", "attributes"));
+                return view("pages.project.components.table-index-col-name", compact("project"));
             })
-            ->addColumn('description', function ($project) {
-                return Str::limit($project->description, 40, '...');
-                // return "<div class='box'><p>{$project->description}</p></div>";
-            })
-            ->addColumn('action', function ($project) {
-                return view("pages.project.components.table-button-action", compact("project"));
-            })
-            ->rawColumns(['action', "name", "description"])
+            // ->addColumn('description', function ($project) {
+            //     return Str::limit($project->description, 40, '...');
+            //     // return "<div class='box'><p>{$project->description}</p></div>";
+            // })
+            // ->addColumn('action', function ($project) {
+                // return view("pages.project.components.table-button-action", compact("project"));
+            // })
+            ->rawColumns(["name"])
             ->make(true);
     }
 
@@ -90,6 +91,7 @@ class ProjectController extends Controller
     {
         // $project = Project::where("id", $project_id)->with(["project_methods"])->firstOrfail();
         $project_methods = ProjectMethod::where("project_id", $project_id)->with(["method"])->latest()->get();
+        // dd($project_methods);
 
         return Datatables::of($project_methods)
             ->addIndexColumn()

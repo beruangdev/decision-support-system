@@ -53,13 +53,16 @@ class ProjectMethodController extends Controller
             ->make(true);
     }
 
-    public function get_attribute_keys()
+    public function get_attribute_keys($project_id)
     {
-        $sql = "SELECT DISTINCT JSON_KEYS(attributes) AS attribute_keys FROM alternatives;";
-        $get_dk = DB::select($sql);
+        $sql = "SELECT DISTINCT JSON_KEYS(attributes) AS attribute_keys FROM alternatives where project_id = $project_id;";
+        $get_attr_key = DB::select($sql);
         $attribute_keys = [];
-        if (count($get_dk) > 0) {
-            foreach (json_decode(DB::select($sql)[0]->attribute_keys) as $key) {
+
+        if ($get_attr_key && $get_attr_key[0] && $get_attr_key[0]->attribute_keys) {
+            $get_attr_key = $get_attr_key[0]->attribute_keys;
+            $get_attr_key = json_decode($get_attr_key);
+            foreach ($get_attr_key as $key) {
                 $attribute_keys[] = [
                     "key" => $key,
                     "key_slug" => Str::slug($key),
@@ -69,13 +72,13 @@ class ProjectMethodController extends Controller
         return $attribute_keys;
     }
 
-    public function get_default(Request $request)
+    public function get_default(Request $request, $project_id)
     {
         $methods = DB::table('methods')->get();
         // $alternative_taxonomy_keys = DB::table('alternative_taxonomies')
         //     ->distinct('key_slug')
         //     ->get(['key', 'key_slug']);
-        $attribute_keys = $this->get_attribute_keys();
+        $attribute_keys = $this->get_attribute_keys($project_id);
 
         return response()->json(compact("methods", "attribute_keys"));
     }
@@ -104,7 +107,6 @@ class ProjectMethodController extends Controller
         $project_method->description = $request->description;
         $project_method->method_id = intval($request->method_id);
         $project_method->project_id = intval($project_id);
-        $project_method->criteria_rasio_json = "";
         $project_method->save();
 
         $criterias = collect();
@@ -118,29 +120,7 @@ class ProjectMethodController extends Controller
             $criterias->push($criteria);
         }
 
-        $criteria_rasios = collect();
-        $criteria_rasio_json = collect();
-        foreach ($request->criteria_rasios as $key => $req_criteria_rasio) {
-            $criteria_rasio = new CriteriaRasio();
-            $criteria_rasio->criteria_id_1 = $criterias->where("slug", $req_criteria_rasio["slugs"][0])->first()->id;
-            $criteria_rasio->criteria_id_2 = $criterias->where("slug", $req_criteria_rasio["slugs"][1])->first()->id;
-            $criteria_rasio->rasio = $req_criteria_rasio["rasio"];
-            $criteria_rasio->save();
-            $criteria_rasios->push($criteria_rasio);
-            $criteria_rasio_json->push([
-                // "criteria_id_1" => $criteria_rasio->criteria_id_1,
-                // "criteria_id_2" => $criteria_rasio->criteria_id_2,
-                "ids" => [$criteria_rasio->criteria_id_1, $criteria_rasio->criteria_id_2],
-                "slugs" => [$req_criteria_rasio["slugs"][0], $req_criteria_rasio["slugs"][1]],
-                "rasio" => $criteria_rasio->rasio,
-            ]);
-        }
-
-        $criteria_rasio_json = $criteria_rasio_json->toJson();
-        $project_method->criteria_rasio_json = $criteria_rasio_json;
-        $project_method->save();
-
-        return response()->json(compact("project_method", "criterias", "criteria_rasios"));
+        return response()->json(compact("project_method", "criterias"));
     }
 
     /**
@@ -169,7 +149,7 @@ class ProjectMethodController extends Controller
 
         $methods = Method::all();
         // $alternative_taxonomy_keys = AlternativeTaxonomy::distinct("key_slug")->get(["key", "key_slug"]);
-        $attribute_keys = collect($this->get_attribute_keys())->toArray();
+        $attribute_keys = collect($this->get_attribute_keys($project_id))->toArray();
 
         return view("pages.project_method.edit", compact("project_method", "methods", "attribute_keys"));
     }
@@ -189,7 +169,7 @@ class ProjectMethodController extends Controller
         $project_method->name = $request->name;
         $project_method->description = $request->description;
         $project_method->method_id = intval($request->method_id);
-        $project_method->criteria_rasio_json = "";
+        $project_method->rasios = "[]";
         $project_method->save();
 
         $criterias = collect();
@@ -207,32 +187,19 @@ class ProjectMethodController extends Controller
             $criterias->push($criteria);
         }
 
-        $criteria_rasios = collect();
-        $criteria_rasio_json = collect();
+        $rasios = collect();
         foreach ($request->criteria_rasios as $key => $req_crit_rasio) {
-            $criteria_id_1 = $criterias->where("slug", $req_crit_rasio["slugs"][0])->first()->id;
-            $criteria_id_2 = $criterias->where("slug", $req_crit_rasio["slugs"][1])->first()->id;
-            $criteria_rasio = CriteriaRasio::where("criteria_id_1", $criteria_id_1)->where("criteria_id_2", $criteria_id_2)->first();
-            if (!$criteria_rasio) {
-                $criteria_rasio = new CriteriaRasio();
-                $criteria_rasio->criteria_id_1 = $criteria_id_1;
-                $criteria_rasio->criteria_id_2 = $criteria_id_2;
-            }
-            $criteria_rasio->rasio = $req_crit_rasio["rasio"];
-            $criteria_rasio->save();
-            $criteria_rasios->push($criteria_rasio);
-            $criteria_rasio_json->push([
-                "ids" => [$criteria_rasio->criteria_id_1, $criteria_rasio->criteria_id_2],
+            $rasios->push([
                 "slugs" => [$req_crit_rasio["slugs"][0], $req_crit_rasio["slugs"][1]],
-                "rasio" => $criteria_rasio->rasio,
+                "rasio" => $req_crit_rasio["rasio"],
             ]);
         }
 
-        $criteria_rasio_json = $criteria_rasio_json->toJson();
-        $project_method->criteria_rasio_json = $criteria_rasio_json;
+        $rasios = $rasios->toJson();
+        $project_method->rasios = $rasios;
         $project_method->save();
 
-        return response()->json(compact("project_method", "criterias", "criteria_rasios"));
+        return response()->json(compact("project_method", "criterias"));
     }
 
     /**

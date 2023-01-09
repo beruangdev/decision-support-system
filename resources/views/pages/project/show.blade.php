@@ -8,8 +8,8 @@
                         <thead>
                             <tr>
                                 <th></th>
-                                <th class="min-w-[10rem] md:min-w-[15rem]">Name</th>
-                                <th>Description</th>
+                                <th>Name</th>
+                                {{-- <th>Description</th> --}}
                                 <th>Method</th>
                                 <th></th>
                             </tr>
@@ -39,6 +39,7 @@
                 processing: true,
                 serverSide: true,
                 deferRender: true,
+                scrollX: true,
                 ajax: "{{ route('project.show.list', $project_id) }}",
                 columns: [{
                         data: 'DT_RowIndex',
@@ -48,10 +49,10 @@
                         data: 'name',
                         name: 'name',
                     },
-                    {
-                        data: 'description',
-                        name: 'description',
-                    },
+                    // { 
+                    //     data: 'description',
+                    //     name: 'description',
+                    // },
                     {
                         data: 'method',
                         name: 'method',

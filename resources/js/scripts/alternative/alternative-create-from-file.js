@@ -48,13 +48,6 @@ function createAlternativeFromFile(element) {
             this.worker.onmessage = (event) => {
                 const action = event.data.action
                 const data = event.data.data
-                console.log("  ");
-                console.log('====================================');
-                console.log("action", action);
-                console.log("data", data);
-                console.log('====================================');
-                console.log("  ");
-                // console.log("this", this);
 
                 if (action == "update") this.update(data)
                 if (action == "add_queue") this.add_queue(data)
@@ -64,7 +57,7 @@ function createAlternativeFromFile(element) {
                     this.update_table()
                 }
 
-                this.log("queues", this.queues);
+                // this.log("queues", this.queues);
 
             };
 

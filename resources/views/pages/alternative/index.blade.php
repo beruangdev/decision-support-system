@@ -29,7 +29,7 @@
     <form method="post" action="{{ route('alternative.index', ['project' => Route::input('project')]) }}" class="p-6 form-edit-alternative" x-data="editAltenative($el)" x-init="init" @submit.prevent="submitEditAltenative">
         @csrf
 
-        <h2 class="text-lg font-medium text-gray-900 flex flex-wrap">
+        <h2 class="text-lg font-medium text-gray-900 flex flex-wrap mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-2">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
@@ -37,26 +37,34 @@
             {{ __('Edit Alternative') }}
         </h2>
 
-        <div class="mt-6">
+        <div class="mb-2">
             <template x-if="body.name.error">
                 <label for="alternative-edit-name">
                     <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit text-sm text-red-500 leading-3" x-text="body.name.message"></p>
                 </label>
             </template>
-            <input type="text" id="alternative-edit-name" name="name" placeholder="Name" :value="body.name.value" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm rounded-md mt-1 block w-full"
+            <input type="text" id="alternative-edit-name" name="name" placeholder="Name" :value="body.name.value" x-model="body.name.value" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm rounded-md mt-1 block w-full"
                 data-required>
         </div>
-        <div class="mt-2">
+        <div class="mb-2">
+            <template x-if="body.uuid.error">
+                <label for="alternative-edit-uuid">
+                    <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit text-sm text-red-500 leading-3" x-text="body.uuid.message"></p>
+                </label>
+            </template>
+            <input type="text" id="alternative-edit-uuid" name="uuid" placeholder="Unix ID" :value="body.uuid.value" x-model="body.uuid.value" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm rounded-md mt-1 block w-full">
+        </div>
+        <div class="mb-4">
             <template x-if="body.description.error">
                 <label for="alternative-edit-description">
                     <p class="-mb-[0.8rem] px-2 py-1 bg-white relative ml-2 w-fit  text-sm text-red-500 leading-3" x-text="body.description.message"></p>
                 </label>
             </template>
-            <textarea id="alternative-edit-description" name="description" placeholder="Description" class="mt-1 block w-full rounded-md" x-text="body.description.value":value="body.description.value" id="" cols="30" rows="4"></textarea>
+            <textarea id="alternative-edit-description" name="description" placeholder="Description" class="mt-1 block w-full rounded-md" x-text="body.description.value" :value="body.description.value" x-model="body.description.value" id="" cols="30" rows="4"></textarea>
         </div>
 
 
-        <div class="mt-4">
+        <div class="mb-4">
             <p class="mb-1">Add Alternative Attributes (if number just fill numerik value)</p>
             <div class="grid grid-cols-12 gap-2">
                 <x-text-input id="alternative-edit-key" name="key" type="text" placeholder="Key" class="col-span-5" />
@@ -69,7 +77,7 @@
             </div>
         </div>
 
-        <div class="mt-4 overflow-auto">
+        <div class="mb-6 overflow-auto">
             <p class="mb-1">Alternative Attributes</p>
             <table class="table-fixed w-full border-separate">
                 <thead>
@@ -107,7 +115,7 @@
         </div>
 
 
-        <div class="mt-6 flex justify-end">
+        <div class="flex justify-end">
             <x-secondary-button class="close-alternative-edit-modal" x-on:click="$dispatch('close')">
                 {{ __('Cancel') }}
             </x-secondary-button>

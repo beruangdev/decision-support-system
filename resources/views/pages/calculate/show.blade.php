@@ -231,13 +231,13 @@
 
 <script>
     $(document).ready(function() {
-        const selector = `#sum_weight-tab`
-        var theInterval = setInterval(() => {
-            if (document.querySelector(selector)) {
-                document.querySelector(selector).click()
-                clearInterval(theInterval)
-            }
-        }, 10);
+        // const selector = `#score_rating-tab`
+        // var theInterval = setInterval(() => {
+        //     if (document.querySelector(selector)) {
+        //         document.querySelector(selector).click()
+        //         clearInterval(theInterval)
+        //     }
+        // }, 10);
 
     });
 </script>

@@ -16,19 +16,33 @@
 //     @apply dark:bg-gray-900/40;
 // }
 
-*, ::before, ::after{
-    @apply dark:border-gray-600 border-solid;
+// *.border {
+// @apply dark:border-gray-600 border-solid;
+// }
 
+.border {
+    @apply dark:border-gray-600 border-solid;
 }
 
-.text-gray-500, h1, h2, h3, h4, h5, h6, p, a, span {
+.text-gray-500,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+span {
     @apply dark:text-gray-300;
 }
 
-input, textarea{
+input,
+textarea {
     @apply dark:border-gray-700;
 }
-[disabled], .disabled {
+[disabled],
+.disabled {
     @apply cursor-not-allowed;
 }
 // main .bg-white {

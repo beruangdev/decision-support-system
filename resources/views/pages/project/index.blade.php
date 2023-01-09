@@ -7,9 +7,7 @@
                         <thead class="text-xs text-gray-700 text-center bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th></th>
-                                <th class="min-w-[10rem] md:min-w-[15rem]">Name</th>
-                                <th class="max-w-[50rem]">Description</th>
-                                <th></th>
+                                <th>Name</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -109,16 +107,16 @@
                         data: 'name',
                         name: 'name',
                     },
-                    {
-                        data: 'description',
-                        name: 'description',
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
+                    // {
+                    //     data: 'description',
+                    //     name: 'description',
+                    // },
+                    // {
+                    //     data: 'action',
+                    //     name: 'action',
+                    //     orderable: false,
+                    //     searchable: false
+                    // },
                 ],
             });
 

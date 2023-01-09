@@ -1,7 +1,7 @@
 window.createProjectMethod = function (element) {
     return {
         element,
-        detail_keys: [],
+        attribute_keys: [],
         methods: [],
         body: {},
         inputs: {},
@@ -14,25 +14,19 @@ window.createProjectMethod = function (element) {
         input_selector: `.container-input-project-method input[type="text"], .container-input-project-method textarea, .container-input-project-method select, .container-input-project-method input[type="checkbox"]`,
 
         async init() {
-            // console.log("INITIALIZE: createProjectMethod()");
-            // this.detail_keys = JSON.parse(element.getAttribute("data-detail_keys"))
-
             let init_response = await fetch(element.getAttribute("data-url_get_default"))
             init_response = await init_response.json()
 
-            this.detail_keys = init_response.detail_keys
+            this.attribute_keys = init_response.attribute_keys
             this.methods = init_response.methods
 
 
-            this.detail_keys = this.detail_keys.sort((a, b) => a.key_slug.localeCompare(b.key_slug));
+            this.attribute_keys = this.attribute_keys.sort((a, b) => a.key_slug.localeCompare(b.key_slug));
             
-
-            // console.log("detail_keys", this.get(this.detail_keys));
-            // await new Promise((r) => setTimeout(r, 10))
             window.onload = () => {
                 this.pull_input_values()
-                console.log("body", this.get(this.body));
-                console.log("inputs", this.get(this.inputs));
+                // console.log("body", this.get(this.body));
+                // console.log("inputs", this.get(this.inputs));
             }
         },
         submit() {
@@ -41,7 +35,7 @@ window.createProjectMethod = function (element) {
             if (!this.validate()) return false
             let body = this.get(this.body)
             // get rasio
-            body.criteria_rasios = this.pull_input_criteria_rasio_values()
+            // body.criteria_rasios = this.pull_input_criteria_rasio_values()
 
             delete body.type
             console.log("body", body);
@@ -126,11 +120,9 @@ window.createProjectMethod = function (element) {
             }
             Object.keys(this.inputs).forEach(key => {
                 let element = this.inputs[key].element
-                console.log("this.inputs[key]", element);
                 if (isElement(element) && element.getAttribute("data-required") != undefined) {
                     let length = this.inputs[key].value.length
                     if (key == "criterias") length = this.inputs[key].value.filter(v => v.checked).length
-
                     if (length < this.inputs[key].min_length) {
                         is_validate = false
                         this.inputs[key].error = true
@@ -205,9 +197,7 @@ window.createProjectMethod = function (element) {
 
             element.querySelectorAll(`.container-criterias input[type="checkbox"][name="criterias"]`).forEach(input => input.checked = false)
         },
-        updateAlternativedetailKeys(atk, index) {
-            console.log("CHANGEEE");
-
+        updateAlternativeattributeKeys(atk, index) {
             this.criterias = []
             // INIT Criteria
             let actives = []
@@ -239,25 +229,6 @@ window.createProjectMethod = function (element) {
                     }
                 });
             });
-
-            console.log("this.criteria_values", this.get(this.criteria_values));
-            console.log("this.criterias", this.get(this.criterias));
-        },
-        updateCriteriaValue(index, input_name) {
-            console.log("updateCriteriaValue");
-            let el = element.querySelector(`input[name='${input_name}']`)
-            if (!el) {
-                console.log("ELEMENT TIDAK ADA", el, input_name);
-                return false
-            }
-
-            let value = parseInt(el.value)
-            this.criterias[index].value = value
-            this.criteria_values[input_name] = value
-
-
-            console.log("this.criteria_values", this.get(this.criteria_values));
-            console.log("this.criterias", this.get(this.criterias));
         },
     }
 }

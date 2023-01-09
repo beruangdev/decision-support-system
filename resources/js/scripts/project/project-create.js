@@ -47,7 +47,7 @@ window.createProject = function (element) {
             }
         },
         url() {
-            return routes["project.store"].uri
+            return element.getAttribute("action")
         },
         validate() {
             let result = true

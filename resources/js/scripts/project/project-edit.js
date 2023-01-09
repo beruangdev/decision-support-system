@@ -20,7 +20,6 @@ window.editProject = function (element) {
                     this.body[key].value = this.project[key]
                 })
             })
-            console.log(this.body);
         },
         async submit() {
             console.log("SUBMIT");
@@ -33,7 +32,9 @@ window.editProject = function (element) {
 
             element.querySelector(".modal-close").click()
             console.log({ request });
-            let url = `${routes["project.store"].uri}/${this.project.id}`
+            // let url = `${routes["project.store"].uri}/${this.project.id}`
+            // let url = `${routes["project.store"].uri}/${this.project.id}`
+            let url = this.url(this.project.id)
             let response = await fetch(url, {
                 method: 'PUT',
                 body: JSON.stringify(request),
@@ -52,6 +53,9 @@ window.editProject = function (element) {
             if (window.table_project) {
                 window.table_project.ajax.reload(null, false)
             }
+        },
+        url(id) {
+            return `${element.getAttribute("action")}/${id}`
         },
         validate() {
             let result = true

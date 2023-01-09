@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
 
         // Project Method
         Route::get("{project}/method/list", [ProjectMethodController::class, "list"])->name("project_method.list");
-        Route::get("method/get_default", [ProjectMethodController::class, "get_default"])->name("project_method.get_default");
+        Route::get("{project}/method/get_default", [ProjectMethodController::class, "get_default"])->name("project_method.get_default");
         Route::post("{project}/method", [ProjectMethodController::class, "store"])->name("project_method.store");
         Route::resource("{project}/method", ProjectMethodController::class)->names("project_method")->except([
             'store'
@@ -61,13 +61,14 @@ Route::middleware('auth')->group(function () {
 
     // Project
     Route::as('project.')->prefix("project")->group(function () {
-        Route::get("show/list/{project}", [ProjectController::class, "show_list"])->name("show.list");
+        Route::get("{project}/list", [ProjectController::class, "show_list"])->name("show.list");
         Route::get("list", [ProjectController::class, "list"])->name("list");
 
         // Project Attribute
         Route::get("{project}/attribute", [ProjectController::class, "attribute"])->name("attribute");
         Route::post("{project}/attribute", [ProjectController::class, "attribute_update"])->name("attribute");
     });
+    
     Route::resource("project", ProjectController::class);
 });
 

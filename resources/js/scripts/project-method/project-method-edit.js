@@ -1,8 +1,9 @@
-window.alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+// window.alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+// window.alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 window.editProjectMethod = function (element) {
     return {
         element,
-        detail_keys: [],
+        attribute_keys: [],
         old_value: [],
         body: {
             name: "",
@@ -101,11 +102,11 @@ window.editProjectMethod = function (element) {
             //     [0.1111111111111111, 0.14285714285714285, 0.14285714285714285, 0.3333333333333333, 1]
             // ]
             let old_values = [
-                [1,3,7,1,1],
-                [0.3333333333333333,1,3,0.3333333333333333,0.2],
-                [0.14285714285714285,0.3333333333333333,1,0.1111111111111111,0.14285714285714285],
-                [1,3,9,1,1],
-                [1,5,7,1,1]
+                [1, 3, 7, 1, 1],
+                [0.3333333333333333, 1, 3, 0.3333333333333333, 0.2],
+                [0.14285714285714285, 0.3333333333333333, 1, 0.1111111111111111, 0.14285714285714285],
+                [1, 3, 9, 1, 1],
+                [1, 5, 7, 1, 1]
             ]
 
             if (this.body.criterias.filter(c => c.checked).length != check_criteria.length) {
@@ -164,28 +165,31 @@ window.editProjectMethod = function (element) {
                     name, slug, type, checked: checked == 0 ? false : true
                 }
             })
-            const old_detail_keys = JSON.parse(element.getAttribute("data-detail_keys"))
 
-            old_detail_keys.forEach(({ name, slug }, index) => {
-                let has_criteria = this.body.criterias.filter(criteria => criteria.slug == slug).length
+            const old_attribute_keys = JSON.parse(element.getAttribute("data-attribute_keys"))
+
+            old_attribute_keys.forEach(({ key, key_slug }, index) => {
+                let has_criteria = this.body.criterias.filter(criteria => criteria.slug == key_slug).length
                 has_criteria = has_criteria > 0 ? true : false
-                if (!has_criteria && slug && name) {
+                if (!has_criteria && key_slug && key) {
                     this.body.criterias.push({
-                        name,
-                        slug,
+                        name: key,
+                        slug: key_slug,
                         checked: false,
                         type: "cost"
                     })
                 }
             })
+            log("old_attribute_keys", old_attribute_keys)
 
             this.body.criterias = this.body.criterias.sort((a, b) => a.slug.localeCompare(b.slug))
 
-            let initial_index = 0
+            let initial_index = 1
             this.body.criterias = this.body.criterias.map((criteria) => {
                 let initial = ""
                 if (criteria.checked) {
-                    initial = alphabet[initial_index]
+                    // initial = alphabet[initial_index]
+                    initial = `C${initial_index}`
                     initial_index++
                 }
                 return {
@@ -193,6 +197,7 @@ window.editProjectMethod = function (element) {
                 }
             })
 
+            log("this.body.criterias", this.body.criterias)
             // draw criteria initial
             let criteria_initial_html = ""
             this.body.criterias.filter(c => c.checked).forEach(c => {
@@ -201,8 +206,10 @@ window.editProjectMethod = function (element) {
             document.querySelector(".criteria-initial").innerHTML = criteria_initial_html
 
             // Init Criteria Rasios
-            // this.body.criteria_rasios
-            let criteria_rasio_json = JSON.parse(this.old_value.criteria_rasio_json)
+            log("this.body", this.body)
+            log("this.old_value", this.old_value)
+            if (!this.old_value.rasios) this.old_value.rasios = "[]"
+            let rasios = JSON.parse(this.old_value.rasios)
             this.body.criterias.forEach((criteria1, index1) => {
                 this.body.criterias.forEach((criteria2, index2) => {
                     if (index1 < index2) {
@@ -212,7 +219,7 @@ window.editProjectMethod = function (element) {
                             value: 0,
                             checked: criteria1.checked && criteria2.checked,
                         }
-                        let value = criteria_rasio_json.filter(({ slugs }) => slugs[0] == cr.slugs[0] && slugs[1] == cr.slugs[1])[0]
+                        let value = rasios.filter(({ slugs }) => slugs[0] == cr.slugs[0] && slugs[1] == cr.slugs[1])[0]
 
                         if (value) {
                             cr.value = this.weights.findIndex((val, index) => {
@@ -236,10 +243,9 @@ window.editProjectMethod = function (element) {
                     rasio: this.weights[cr.value].value
                 }
             })
-            // element.submit()
+
+            log("body", body)
             this.ajax(body)
-            // location.reload()
-            // this.resetForm()
         },
         get(obj) {
             return JSON.parse(JSON.stringify(obj))
@@ -319,12 +325,13 @@ window.editProjectMethod = function (element) {
             element.querySelectorAll(`.container-criterias input[type="checkbox"][name="criterias"]`).forEach(input => input.checked = false)
         },
         onCriteriaUpdate(index, criteria1) {
-            let initial_index = 0
+            let initial_index = 1
             // update criteria initial
             this.body.criterias = this.body.criterias.map((criteria) => {
                 let initial = ""
                 if (criteria.checked) {
-                    initial = alphabet[initial_index]
+                    // initial = alphabet[initial_index]
+                    initial = `C${initial_index}`
                     initial_index++
                 }
                 return {

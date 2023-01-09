@@ -144,7 +144,7 @@
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button
-                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-840 hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                                class="inline-flex items-center px-3 py-2 border border-transparent dark:border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-840 hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                                 <div>{{ Auth::user()->name }}</div>
 
                                 <div class="ml-1">
@@ -400,12 +400,11 @@
                 <div class="mb-3">
                     <div class="wrapper-input-floating-label">
                         <div class="relative">
-                            <textarea name="uuid" cols="30" rows="4"
-                                class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent dark:bg-transparent rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer" placeholder=" " :value="body.uuid.value"
-                                x-model="body.uuid.value"></textarea>
-                            <label for="outlined_error"
-                                class="absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-5 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1 flex items-center">
-                                ID <div class="text-xs inline-block ml-1 leading-[1.1rem]">(such as an identification number)</div>
+                            <input type="text" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent dark:bg-transparent rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer"
+                                name="uuid" placeholder=" " :value="body.uuid.value" x-model="body.uuid.value" data-required />
+                            <label
+                                class="absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">
+                                Unix ID <div class="text-xs inline-block ml-1 leading-[1.1rem]">(such as an identification number)</div>
                             </label>
                         </div>
                         <p class="mt-1 text-xs text-red-600 dark:text-red-400 input-floating-label-error-message" x-text="body.uuid.message">
@@ -525,7 +524,7 @@
                         {{ __('Add Method') }}
                     </h2>
 
-                    <form action="{{ route('project_method.store', ['project' => $project_id]) }}" x-data="createProjectMethod($el)" x-init="this.init" @submit.prevent="submit" data-url_get_default="{{ route('project_method.get_default') }}">
+                    <form action="{{ route('project_method.store', ['project' => $project_id]) }}" x-data="createProjectMethod($el)" x-init="this.init" @submit.prevent="submit" data-url_get_default="{{ route('project_method.get_default', ["project" => $project_id]) }}">
 
                         <div class="container-error text-red-600 my-3">
                             <p class="error-header">&nbsp;</p>
@@ -594,26 +593,6 @@
                                         </div>
                                     </div>
 
-                                    {{-- Specify Criterias Rasio --}}
-                                    <template x-if="Object.keys(criterias).length > 0">
-                                        <div class="container-weight">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Specify criteria rasio<span class="text-xs">*select at least 3 criteria</span></label>
-                                            <template x-for="(criteria, index) in criterias.filter(c => c.status)">
-                                                <div class="flex flex-col mb-4 px-4 pt-2 pb-4 rounded-md border border-gray-700">
-                                                    <div class="mb-3 grid grid-cols-12 md:grid-cols-11 gap-2">
-
-                                                        <p x-text="criteria.label1" class="col-span-5 md:col-span-5 text-[0.9rem]"></p>
-
-                                                        <p x-text="weights[criteria.value]" class="col-span-2 md:col-span-1 aspect-square flex items-center border justify-center  border-gray-700 rounded-md w-[2rem]"></p>
-
-                                                        <p x-text="criteria.label2" class="col-span-5 md:col-span-5 text-[0.9rem]"></p>
-                                                    </div>
-                                                    <input :name="`${criteria.slug1}+${criteria.slug2}`" type="range" :value="criteria_values[`${criteria.slug1}+${criteria.slug2}`]" min="0" max="16"
-                                                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" @change="updateCriteriaValue(index, `${criteria.slug1}+${criteria.slug2}`)">
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </template>
                                 </div>
                                 {{-- RIGHT END --}}
 
@@ -636,3 +615,13 @@
     </div>
     {{-- Modal Create Project Method END --}}
 @endisset
+
+{{-- <script>
+    addEventListener('DOMContentLoaded', (event) => {
+        console.log("DOMContentLoaded");
+        setTimeout(() => {
+            console.log("click");
+            document.querySelector(`[data-modal-toggle="modal-create-project-method"]`).click()
+        }, 1000);
+    });
+</script> --}}

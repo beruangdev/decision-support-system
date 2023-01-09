@@ -11,12 +11,12 @@
     <div id="dropdownDots" class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
             <li>
-                <x-dropdown-link x-on:click.prevent="$dispatch('open-modal', 'modal-edit-alternative')" data-alternative="{{ $alternative }}" class="button-edit-alternative">
+                <x-dropdown-link x-on:click.prevent="$dispatch('open-modal', 'modal-edit-alternative')" data-alternative="{{ $alternative }}" class="button-edit-alternative" action="{{ route('alternative.update', ['project' => $project_id, 'alternative' => $alternative->id]) }}">
                     {{ __('Edit') }}
                 </x-dropdown-link>
             </li>
             <li>
-                <x-dropdown-link href="{{ route('alternative.destroy', ['project' => Route::input('project'), 'alternative' => $alternative->id]) }}" class="button-delete-alternative">
+                <x-dropdown-link href="{{ route('alternative.destroy', ['project' => $project_id, 'alternative' => $alternative->id]) }}" class="button-delete-alternative">
                     {{ __('Delete') }}
                 </x-dropdown-link>
             </li>

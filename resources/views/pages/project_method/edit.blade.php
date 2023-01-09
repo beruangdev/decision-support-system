@@ -94,14 +94,14 @@
 
                             <div class="flex justify-end gap-2">
                                 @if (Auth::user()->role == 'admin')
-                                    <x-link class="reset-criteria-rasio bg-gray-700 text-white hover:bg-gray-900" @click="resetCriteriaRasio">
+                                    <x-button class="reset-criteria-rasio bg-gray-700 text-white hover:bg-gray-900" @click="resetCriteriaRasio">
                                         Reset Rasio
-                                    </x-link>
+                                    </x-button>
                                 @endif
-                                <x-link class="bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-white dark:text-white" data-modal-toggle="create-calculate">{{ __('Calculate') }}</x-link>
-                                <x-secondary-button class="bg-gray-700 text-white hover:!bg-gray-900" type="submit">
+                                <x-button class="bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-white dark:text-white" data-modal-toggle="create-calculate">{{ __('Calculate') }}</x-button>
+                                <x-button class="bg-gray-700 text-white hover:!bg-gray-900" type="submit">
                                     {{ __('Update') }}
-                                </x-secondary-button>
+                                </x-button>
                             </div>
                         </div>
 
@@ -181,8 +181,8 @@
 
                                 {{-- Specify Criterias Rasio --}}
                                 <div class="container-weight">
-                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Specify criteria rasio<span class="text-xs">*select at least 3 criteria</span></label>
-                                    <div class="grid grid-cols-2 gap-2">
+                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Criterion comparison</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                         <template x-for="(criteria, index) in body.criteria_rasios" :key="index">
                                             <template x-if="criteria.checked">
                                                 <div class="flex flex-col mb-4 px-4 pt-2 pb-4 rounded-md border border-gray-300 dark:border-gray-700">
@@ -232,7 +232,7 @@
 <div id="create-calculate" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full">
     <div class="relative w-full h-full max-w-xl md:h-auto">
         <!-- Modal content -->
-        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-840">
             <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
                 data-modal-toggle="create-calculate">
                 <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -251,6 +251,19 @@
                     ]) }}"
                     x-data="createCalculate($el)" x-init="this.init">
                     @csrf
+
+                    {{-- NAME --}}
+                    <div>
+                        <x-input-float value="" label-text="Name" label-class="" class="" name="name"/>
+                    </div>
+
+                    {{-- DESCRIPTION --}}
+                    <div>
+                        <x-textarea-float name="description" label-text="Description" rows="4">
+                        </x-textarea-float>
+                    </div>
+
+
                     <div>
                         <label for="input-algorithms" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an algorithm</label>
                         <select id="input-algorithms" name="algorithm"

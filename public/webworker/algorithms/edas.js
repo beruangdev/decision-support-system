@@ -124,12 +124,12 @@ class Edas {
             let alt_name = `[${alt.uuid}] ${alt.name}`
             let newalt = [index + 1, alt_name]
             for (let index_c = 0; index_c < this.criterias.length; index_c++) {
-                newalt.push(alt.details[this.criterias[index_c].name])
+                newalt.push(alt.attributes[this.criterias[index_c].name])
 
                 // buat array baru didalam array rotate untuk menampung data
                 if (!this.alternative_array_rotate[index_c]) this.alternative_array_rotate[index_c] = []
                 // Push data ke array rotate
-                this.alternative_array_rotate[index_c].push(alt.details[this.criterias[index_c].name])
+                this.alternative_array_rotate[index_c].push(alt.attributes[this.criterias[index_c].name])
             }
             this.decision_matrix.push(newalt)
         }

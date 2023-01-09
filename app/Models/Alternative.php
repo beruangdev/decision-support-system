@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Str;
 class Alternative extends Model
 {
     use HasFactory;
@@ -14,9 +14,12 @@ class Alternative extends Model
     protected static function boot()
     {
         parent::boot();
-        static::creating(function ($post) {
-            if (is_null($post->user_id)) {
-                $post->user_id = auth()->user()->id;
+        static::creating(function ($record) {
+            if (is_null($record->user_id)) {
+                $record->user_id = auth()->user()->id;
+            }
+            if (is_null($record->user_id)) {
+                $record->uuid = Str::uuid();
             }
         });
     }

@@ -3,9 +3,10 @@ function editAltenative(element) {
     return {
         body: {},
         element,
-        detail: null,
-        details: [],
-        target_dom: "input#alternative-edit-name, textarea#alternative-edit-description, textarea#alternative-edit-uuid",
+        url: "",
+        old_alternative: null,
+        attributes: [],
+        target_dom: "input#alternative-edit-name, input#alternative-edit-uuid, textarea#alternative-edit-description",
         target_dom_validate: "input#alternative-edit-name",
         async submitEditAltenative(e) {
             e.preventDefault()
@@ -25,36 +26,41 @@ function editAltenative(element) {
                 input.setAttribute("class", str_class)
             });
 
+            log("this.body", this.body)
             let request = {}
             Object.keys(this.body).forEach(key => {
                 request[key] = this.body[key].value
             })
-            request["details"] = this.details.map(tax => {
+            request["attributes"] = this.attributes.map(tax => {
                 return {
                     key: tax.key,
                     value: tax.value,
                 }
             })
+            log("request", request)
+
             if (values.every(value => value != "")) {
                 element.querySelector(".close-alternative-edit-modal").click()
-                let res = await fetch(`${routes["alternative.index"].uri}/${this.detail.id}`, {
+                let url = this.url;
+                let res = await fetch(url, {
                     method: 'PUT',
                     body: JSON.stringify(request),
                     headers: {
                         "Accept": "application/json, text-plain, */*",
                         "X-Requested-With": "XMLHttpRequest",
                         'Content-Type': 'application/json',
-                        'url': routes["alternative.store"].uri,
+                        'url': url,
                         "X-CSRF-Token": csrf
                     },
                 })
 
-                // res = await res.json()
+                res = await res.json()
+                log("res", res)
                 
                 Object.keys(this.body).forEach(key => {
                     this.body[key] = { ...this.body[key], value: "" }
                 })
-                this.details = []
+                this.attributes = []
                 // element.querySelector("#alternative-description").innerHtml = ""
 
                 if (window.table_alternative) {
@@ -77,29 +83,29 @@ function editAltenative(element) {
 
             on(".button-edit-alternative", "click", (e, _this) => {
                 let old_alternative = JSON.parse(_this.getAttribute("data-alternative"))
-                this.detail = old_alternative
+                this.url = _this.getAttribute("action")
+                this.old_alternative = old_alternative
                 this.body.name.value = old_alternative.name
                 this.body.uuid.value = old_alternative.uuid
                 this.body.description.value = old_alternative.description
-                old_alternative.details = JSON.parse(old_alternative.details)
-                this.details = Object.keys(old_alternative.details).map(key => {
-                    return { key: key, value: old_alternative.details[key] }
+                old_alternative.attributes = JSON.parse(old_alternative.attributes)
+                this.attributes = Object.keys(old_alternative.attributes).map(key => {
+                    return { key: key, value: old_alternative.attributes[key] }
                 })
-
             })
         },
         addDetail() {
             const key = element.querySelector("#alternative-edit-key").value
             const value = element.querySelector("#alternative-edit-value").value
             if (key && value) {
-                this.details.push({ key, value })
+                this.attributes.push({ key, value })
             }
         },
         updateDetail(index, field, value) {
-            this.details[index][field] = value
+            this.attributes[index][field] = value
         },
         deleteDetail(index) {
-            this.details.splice(index, 1)
+            this.attributes.splice(index, 1)
         }
 
     }
